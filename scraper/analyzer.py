@@ -272,8 +272,8 @@ the Creative Acquisition Manager at Simply Piano.
 This week's competitive intelligence summary:
 - Total ads analyzed: {len(all_ads)}
 - Gap analysis: {json.dumps(gap_analysis.get('summary', ''), indent=2)}
-- Key missing angles: {json.dumps([a['angle'] for a in gap_analysis.get('angles_competitors_use_sp_doesnt', [])[:3])], indent=2)}
-- SP's unique angles: {json.dumps([a['angle'] for a in gap_analysis.get('angles_only_sp_uses', [])[:3])], indent=2)}
+- Key missing angles: {json.dumps([a['angle'] for a in gap_analysis.get('angles_competitors_use_sp_doesnt', [])[:3]], indent=2)}
+- SP's unique angles: {json.dumps([a['angle'] for a in gap_analysis.get('angles_only_sp_uses', [])[:3]], indent=2)}
 
 Write a 4-paragraph strategic memo:
 1. What shifted in the competitive landscape this week
