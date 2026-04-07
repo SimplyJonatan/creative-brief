@@ -145,8 +145,11 @@ def generate_brief(analysis_results: dict, leaderboard: list, config: dict, outp
     total_brands = len(set(a.get("brand") for a in ads))
 
     # ── Ad cards HTML ──
-    new_ads_html = "".join(ad_card_html(a) for a in new_ads[:12]) if new_ads else \
-        '<div style="grid-column:1/-1;text-align:center;padding:48px;color:#8b90b5;border:1px dashed #2e3250;border-radius:12px;"><div style="font-size:32px;margin-bottom:10px;">🔍</div>Running first scan — no history yet. New ads will appear here tomorrow.</div>'
+    # Show new ads if we have them; otherwise fall back to ALL collected ads
+    display_ads = new_ads if new_ads else ads
+    new_ads_html = "".join(ad_card_html(a) for a in display_ads[:12]) if display_ads else \
+        '<div style="grid-column:1/-1;text-align:center;padding:48px;color:#8b90b5;border:1px dashed #2e3250;border-radius:12px;"><div style="font-size:32px;margin-bottom:10px;">🔍</div>No ads collected yet — check that your scraper secrets are set up correctly.</div>'
+    ads_section_label = f"{len(new_ads)} new" if new_ads else f"{len(display_ads)} collected today"
 
     # ── Leaderboard HTML ──
     lb_html = ""
@@ -368,7 +371,7 @@ def generate_brief(analysis_results: dict, leaderboard: list, config: dict, outp
 <div class="container">
 
   <div class="hero">
-    <div class="hero-stat"><div class="num">{len(new_ads)}</div><div class="label">New Ads Today</div></div>
+    <div class="hero-stat"><div class="num">{len(new_ads) if new_ads else len(ads)}</div><div class="label">{"New Ads Today" if new_ads else "Ads Collected"}</div></div>
     <div class="hero-stat"><div class="num">{total_brands}</div><div class="label">Brands Scanned</div></div>
     <div class="hero-stat"><div class="num">{len(leaderboard)}</div><div class="label">Long-Running Winners</div></div>
     <div class="hero-stat"><div class="num">{len(briefs)}</div><div class="label">SP Briefs Generated</div></div>
@@ -377,8 +380,8 @@ def generate_brief(analysis_results: dict, leaderboard: list, config: dict, outp
   <!-- NEW ADS -->
   <div id="new-ads">
     <div class="section-header">
-      <h2 style="font-size:18px;font-weight:600;">🆕 New Ads Found Today</h2>
-      <span style="background:#22263a;border:1px solid #2e3250;border-radius:20px;padding:2px 10px;font-size:11px;color:#8b90b5;">{len(new_ads)} ads</span>
+      <h2 style="font-size:18px;font-weight:600;">🆕 {"New Ads Found Today" if new_ads else "Ads Collected Today"}</h2>
+      <span style="background:#22263a;border:1px solid #2e3250;border-radius:20px;padding:2px 10px;font-size:11px;color:#8b90b5;">{ads_section_label}</span>
     </div>
     <div class="ad-grid">{new_ads_html}</div>
   </div>
