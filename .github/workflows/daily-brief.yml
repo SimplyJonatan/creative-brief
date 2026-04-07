@@ -1,0 +1,49 @@
+name: Daily Creative Brief
+
+on:
+  workflow_dispatch:        # Triggered manually from the brief page or GitHub UI
+
+permissions:
+  contents: write           # Needed to commit and push the updated brief
+
+jobs:
+  generate-brief:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install Python dependencies
+        run: pip install -r scraper/requirements.txt
+
+      - name: Install Playwright + Chromium
+        run: |
+          playwright install chromium
+          playwright install-deps chromium
+
+      - name: Run scraper and brief generator
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          META_ACCESS_TOKEN: ${{ secrets.META_ACCESS_TOKEN }}
+          TRIGGER_TOKEN: ${{ secrets.TRIGGER_TOKEN }}
+        run: python scraper/main.py
+
+      - name: Commit and push updated brief
+        run: |
+          git config --global user.name  "Creative Brief Bot"
+          git config --global user.email "bot@hellosimply.com"
+          git add -A
+          git diff --staged --quiet && echo "No changes today" || (
+            git commit -m "Daily brief $(date -u '+%Y-%m-%d %H:%M UTC')" &&
+            git push
+          )
