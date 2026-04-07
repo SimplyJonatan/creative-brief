@@ -1,0 +1,82 @@
+{
+  "watchlist": {
+    "direct_competitors": [
+      "flowkey", "yousician", "fender play", "pianote", "skoove", "playground sessions"
+    ],
+    "edtech": [
+      "duolingo", "masterclass", "brilliant", "headspace", "rosetta stone", "noom", "coursera"
+    ],
+    "kids": [
+      "abcmouse", "khan academy kids", "splashlearn", "lingokids"
+    ],
+    "50plus": [
+      "brainhq", "lumosity", "aarp", "rosetta stone", "noom"
+    ]
+  },
+  "segments": [
+    {
+      "id": "50plus",
+      "name": "50+ Adults",
+      "description": "Adults 50-75 who always wanted to learn piano and finally have the time",
+      "dos": ["aspirational heroes under 40 visually", "70s-80s song references", "emphasize time availability", "free trial badge", "simple low-tech framing", "self-paced no-stress"],
+      "donts": ["aging language", "word seniors", "tech-heavy language", "fast-paced formats", "people who look over 40"],
+      "approved_hooks": [
+        "Have time? Make it meaningful — learn a real-life skill.",
+        "Going back to piano? This is how it's done in 2026.",
+        "You're in the perfect position to start: you have the time, you have the brain, and we have the app.",
+        "At your own pace, no stress — do it for fun.",
+        "This is your time to fulfill a lifetime dream — playing the piano."
+      ]
+    },
+    {
+      "id": "parents_kids",
+      "name": "Parents & Kids",
+      "description": "Parents looking for structured, fun music education for their children",
+      "dos": ["show parent and child together", "emphasize progress tracking", "fun gamified feel", "structured curriculum", "results kids can show off"],
+      "donts": ["ignore the parent", "make it look like just another screen", "boring practice framing"],
+      "approved_hooks": [
+        "Give them a skill that lasts a lifetime.",
+        "Watch them go from zero to playing real songs — in weeks.",
+        "The piano lesson that fits around your schedule."
+      ]
+    },
+    {
+      "id": "general_adult",
+      "name": "General Adult Beginners",
+      "description": "Adults 25-45 who want to learn piano as a hobby or personal goal",
+      "dos": ["show fast results", "real songs they know", "modern aesthetic", "quick progress proof"],
+      "donts": ["boring scales", "classical only framing", "overwhelming sheet music"],
+      "approved_hooks": [
+        "Play the songs you actually love — not scales.",
+        "Learn piano in weeks, not years.",
+        "Not a game. Not a toy. The real thing."
+      ]
+    }
+  ],
+  "simply_piano_known_angles": [
+    "Learn songs you love",
+    "Step-by-step guidance",
+    "Free trial",
+    "Best self-learning app badge",
+    "Real-time feedback",
+    "Works with any piano or keyboard",
+    "Fun gamified progression"
+  ],
+  "platforms": {
+    "meta": true,
+    "tiktok": true,
+    "google": true
+  },
+  "settings": {
+    "max_ads_per_brand": 5,
+    "longevity_warning_days": 30,
+    "longevity_winner_days": 60,
+    "screenshot_width": 1280,
+    "screenshot_height": 900,
+    "meta_country": "US",
+    "tiktok_region": "US",
+    "anthropic_model": "claude-opus-4-6",
+    "brief_title": "Simply Piano — Creative Brief",
+    "github_pages_url": "https://simplyjonatan.github.io/creative-brief"
+  }
+}
