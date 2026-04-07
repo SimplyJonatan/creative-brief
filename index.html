@@ -1,554 +1,495 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Simply Piano — Creative Brief · April 6, 2026</title>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Simply Piano — Creative Brief · Tuesday, April 7, 2026</title>
   <style>
-    :root {
-      --bg: #0f1117;
-      --surface: #1a1d27;
-      --surface2: #22263a;
-      --border: #2e3250;
-      --accent: #6c63ff;
-      --accent2: #ff6584;
-      --green: #3ecf8e;
-      --yellow: #f7c948;
-      --text: #e8eaf6;
-      --muted: #8b90b5;
-      --radius: 12px;
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; font-size: 15px; line-height: 1.6; }
-
-    .topbar { background: var(--surface); border-bottom: 1px solid var(--border); padding: 14px 32px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
-    .topbar-left { display: flex; align-items: center; gap: 14px; }
-    .logo { font-size: 20px; font-weight: 700; color: var(--accent); letter-spacing: -0.5px; }
-    .badge-date { background: var(--surface2); border: 1px solid var(--border); border-radius: 20px; padding: 3px 12px; font-size: 12px; color: var(--muted); }
-    .topbar-right { display: flex; gap: 10px; align-items: center; }
-    .pill { background: var(--surface2); border: 1px solid var(--border); border-radius: 20px; padding: 4px 14px; font-size: 12px; color: var(--muted); cursor: pointer; transition: all 0.2s; text-decoration: none; display: inline-block; }
-    .pill:hover { border-color: var(--accent); color: var(--accent); }
-    .pill.active { background: var(--accent); color: #fff; border-color: var(--accent); }
-
-    .container { max-width: 1300px; margin: 0 auto; padding: 32px 24px; }
-
-    .hero { background: linear-gradient(135deg, #1a1d27 0%, #22263a 100%); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px 32px; margin-bottom: 32px; display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 24px; }
-    .hero-stat { text-align: center; }
-    .hero-stat .num { font-size: 36px; font-weight: 700; color: var(--accent); }
-    .hero-stat .label { font-size: 12px; color: var(--muted); margin-top: 2px; }
-
-    .intel-banner { background: rgba(108,99,255,0.08); border: 1px solid rgba(108,99,255,0.3); border-radius: var(--radius); padding: 14px 20px; margin-bottom: 28px; font-size: 13px; color: var(--muted); display: flex; align-items: center; gap: 10px; }
-    .intel-banner strong { color: var(--text); }
-
-    .section-header { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; margin-top: 40px; }
-    .section-header h2 { font-size: 18px; font-weight: 600; }
-    .section-tag { background: var(--surface2); border: 1px solid var(--border); border-radius: 20px; padding: 2px 10px; font-size: 11px; color: var(--muted); }
-
-    .filter-bar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
-
-    .ad-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
-    .ad-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; transition: border-color 0.2s, transform 0.2s; }
-    .ad-card:hover { border-color: var(--accent); transform: translateY(-2px); }
-
-    .ad-header { padding: 16px 18px 0; display: flex; align-items: center; gap: 10px; }
-    .ad-brand-icon { width: 36px; height: 36px; border-radius: 8px; background: var(--surface2); display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
-    .ad-brand-name { font-weight: 700; font-size: 14px; }
-    .ad-platform-row { display: flex; gap: 6px; margin-top: 2px; }
-
-    .platform-tag { border-radius: 4px; padding: 1px 7px; font-size: 10px; font-weight: 700; }
-    .platform-meta { background: rgba(24,119,242,0.15); color: #4d9bf7; }
-    .platform-tiktok { background: rgba(255,0,80,0.12); color: #ff4d6d; }
-    .platform-youtube { background: rgba(255,0,0,0.12); color: #ff4d4d; }
-
-    .ad-signal { margin: 12px 18px 0; background: var(--surface2); border-radius: 8px; padding: 10px 14px; }
-    .ad-signal-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
-    .ad-signal-text { font-size: 13px; color: var(--text); font-style: italic; line-height: 1.5; }
-
-    .ad-body { padding: 14px 18px 18px; }
-    .ad-copy { font-size: 13px; color: var(--muted); margin-bottom: 12px; line-height: 1.6; }
-    .ad-meta { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
-    .tag { background: var(--surface2); border: 1px solid var(--border); border-radius: 4px; padding: 2px 7px; font-size: 10px; color: var(--muted); }
-    .tag.green { border-color: var(--green); color: var(--green); }
-    .tag.yellow { border-color: var(--yellow); color: var(--yellow); }
-    .tag.purple { border-color: var(--accent); color: var(--accent); }
-    .tag.red { border-color: var(--accent2); color: var(--accent2); }
-
-    .ad-actions { display: flex; gap: 8px; }
-    .btn { flex: 1; padding: 8px 12px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; border: none; text-align: center; text-decoration: none; transition: opacity 0.2s; display: flex; align-items: center; justify-content: center; gap: 5px; }
-    .btn:hover { opacity: 0.85; }
-    .btn-primary { background: var(--accent); color: #fff; }
-    .btn-secondary { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
-
-    .longevity-pill { display: inline-flex; align-items: center; gap: 5px; background: rgba(62,207,142,0.1); border: 1px solid var(--green); border-radius: 20px; padding: 3px 10px; font-size: 11px; color: var(--green); font-weight: 600; }
-    .longevity-pill.warn { background: rgba(247,201,72,0.1); border-color: var(--yellow); color: var(--yellow); }
-
-    .leaderboard { display: flex; flex-direction: column; gap: 10px; }
-    .lb-row { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 20px; display: flex; align-items: center; gap: 16px; transition: border-color 0.2s; }
-    .lb-row:hover { border-color: var(--accent); }
-    .lb-rank { font-size: 24px; font-weight: 700; color: var(--accent); min-width: 36px; }
-    .lb-icon { width: 44px; height: 44px; border-radius: 10px; background: var(--surface2); display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
-    .lb-info { flex: 1; }
-    .lb-brand { font-weight: 700; font-size: 15px; margin-bottom: 2px; }
-    .lb-why { font-size: 12px; color: var(--muted); }
-    .lb-right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
-
-    .angles-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 16px; }
-    .angle-card { background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--accent); border-radius: var(--radius); padding: 22px 24px; }
-    .angle-num { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
-    .angle-title { font-size: 17px; font-weight: 700; margin-bottom: 10px; line-height: 1.3; }
-    .angle-desc { font-size: 13px; color: var(--muted); line-height: 1.7; margin-bottom: 14px; }
-    .angle-hook { background: var(--surface2); border-radius: 8px; padding: 10px 14px; font-size: 13px; color: var(--text); font-style: italic; margin-bottom: 12px; border-left: 3px solid var(--accent); }
-    .angle-source { font-size: 11px; color: var(--accent); opacity: 0.8; }
-
-    .trend-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
-    .trend-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px 20px; }
-    .trend-icon { font-size: 24px; margin-bottom: 10px; }
-    .trend-title { font-weight: 700; font-size: 14px; margin-bottom: 6px; }
-    .trend-desc { font-size: 13px; color: var(--muted); line-height: 1.6; }
-    .trend-signal { margin-top: 10px; font-size: 11px; color: var(--yellow); }
-
-    .watchlist-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
-    .watchlist-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text); transition: border-color 0.2s; }
-    .watchlist-card:hover { border-color: var(--accent); }
-    .wl-icon { width: 36px; height: 36px; border-radius: 8px; background: var(--surface2); display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
-    .wl-name { font-size: 13px; font-weight: 600; }
-    .wl-cat { font-size: 11px; color: var(--muted); }
-
-    .footer { margin-top: 60px; border-top: 1px solid var(--border); padding: 24px 32px; text-align: center; font-size: 12px; color: var(--muted); }
-
-    @media (max-width: 768px) {
-      .hero { grid-template-columns: 1fr 1fr; }
-      .topbar { padding: 12px 16px; flex-wrap: wrap; gap: 10px; }
-      .container { padding: 20px 16px; }
-    }
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{background:#0f1117;color:#e8eaf6;font-family:'Segoe UI',system-ui,sans-serif;font-size:15px;line-height:1.6;}
+    .topbar{background:#1a1d27;border-bottom:1px solid #2e3250;padding:14px 32px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+    .container{max-width:1300px;margin:0 auto;padding:32px 24px;}
+    .hero{background:linear-gradient(135deg,#1a1d27 0%,#22263a 100%);border:1px solid #2e3250;border-radius:12px;padding:28px 32px;margin-bottom:32px;display:grid;grid-template-columns:repeat(4,1fr);gap:24px;}
+    .hero-stat{text-align:center;}
+    .hero-stat .num{font-size:36px;font-weight:700;color:#6c63ff;}
+    .hero-stat .label{font-size:12px;color:#8b90b5;margin-top:2px;}
+    .section-header{display:flex;align-items:center;gap:10px;margin-bottom:20px;margin-top:40px;}
+    .ad-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px;}
+    .briefs-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:16px;}
+    .trends-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;}
+    .gap-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+    a.pill{background:#22263a;border:1px solid #2e3250;border-radius:20px;padding:4px 14px;font-size:12px;color:#8b90b5;cursor:pointer;transition:all 0.2s;text-decoration:none;display:inline-block;}
+    a.pill:hover,a.pill.active{background:#6c63ff;color:#fff;border-color:#6c63ff;}
+    @media(max-width:768px){.hero{grid-template-columns:1fr 1fr;}.gap-grid{grid-template-columns:1fr;}.topbar{padding:12px 16px;flex-wrap:wrap;gap:8px;}}
+    #refresh-btn{background:#22263a;border:1px solid #2e3250;border-radius:20px;padding:6px 16px;font-size:12px;font-weight:600;color:#8b90b5;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:6px;}
+    #refresh-btn:hover{border-color:#6c63ff;color:#6c63ff;}
+    #refresh-btn:disabled{opacity:0.5;cursor:not-allowed;}
+    #refresh-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:999;align-items:center;justify-content:center;}
+    #refresh-modal.open{display:flex;}
+    #refresh-box{background:#1a1d27;border:1px solid #2e3250;border-radius:16px;padding:32px;width:340px;text-align:center;}
+    #pin-input{background:#0f1117;border:1px solid #2e3250;border-radius:8px;color:#e8eaf6;font-size:20px;letter-spacing:8px;padding:12px;width:100%;text-align:center;margin:16px 0;outline:none;}
+    #pin-input:focus{border-color:#6c63ff;}
+    #pin-error{color:#ff6584;font-size:12px;min-height:18px;margin-bottom:10px;}
+    #pin-submit{background:#6c63ff;color:#fff;border:none;border-radius:8px;padding:10px 24px;font-size:14px;font-weight:600;cursor:pointer;width:100%;}
+    #pin-submit:hover{opacity:0.9;}
+    #pin-cancel{background:none;border:none;color:#8b90b5;font-size:12px;cursor:pointer;margin-top:10px;}
+    #status-toast{display:none;position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1d27;border:1px solid #2e3250;border-radius:12px;padding:14px 24px;font-size:13px;color:#e8eaf6;z-index:1000;gap:10px;align-items:center;}
+    #status-toast.show{display:flex;}
   </style>
 </head>
 <body>
 
-<nav class="topbar">
-  <div class="topbar-left">
-    <span class="logo">🎹 Creative Brief</span>
-    <span class="badge-date">Sunday, April 6, 2026</span>
+<!-- PIN MODAL -->
+<div id="refresh-modal">
+  <div id="refresh-box">
+    <div style="font-size:24px;margin-bottom:8px;">🔄</div>
+    <div style="font-weight:700;font-size:16px;margin-bottom:4px;">Refresh Brief</div>
+    <div style="font-size:13px;color:#8b90b5;margin-bottom:4px;">Enter your PIN to start a new scan.</div>
+    <div style="font-size:11px;color:#8b90b5;">Takes ~10 min. Page auto-refreshes when ready.</div>
+    <input id="pin-input" type="password" maxlength="4" placeholder="····" autocomplete="off"/>
+    <div id="pin-error"></div>
+    <button id="pin-submit" onclick="submitPin()">Run Scan</button>
+    <br/><button id="pin-cancel" onclick="closeModal()">Cancel</button>
   </div>
-  <div class="topbar-right">
-    <a href="#intel" class="pill active">Intelligence</a>
+</div>
+
+<!-- STATUS TOAST -->
+<div id="status-toast">
+  <span id="toast-icon">⏳</span>
+  <span id="toast-msg">Scan started — brief will update in ~10 minutes.</span>
+</div>
+
+<script>
+  const CORRECT_PIN   = '5698';
+  const REPO_OWNER    = 'SimplyJonatan';
+  const REPO_NAME     = 'creative-brief';
+  const WORKFLOW_FILE = 'daily-brief.yml';
+  const GH_TOKEN      = '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';
+
+  function openModal() {
+    document.getElementById('refresh-modal').classList.add('open');
+    document.getElementById('pin-input').value = '';
+    document.getElementById('pin-error').textContent = '';
+    setTimeout(() => document.getElementById('pin-input').focus(), 100);
+  }
+  function closeModal() {
+    document.getElementById('refresh-modal').classList.remove('open');
+  }
+  document.getElementById('pin-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') submitPin();
+  });
+  function showToast(icon, msg, duration=6000) {
+    document.getElementById('toast-icon').textContent = icon;
+    document.getElementById('toast-msg').textContent  = msg;
+    const t = document.getElementById('status-toast');
+    t.classList.add('show');
+    if (duration) setTimeout(() => t.classList.remove('show'), duration);
+  }
+  function submitPin() {
+    const pin = document.getElementById('pin-input').value.trim();
+    if (pin !== CORRECT_PIN) {
+      document.getElementById('pin-error').textContent = 'Incorrect PIN. Try again.';
+      document.getElementById('pin-input').value = '';
+      return;
+    }
+    closeModal();
+    if (!GH_TOKEN || GH_TOKEN === '') {
+      showToast('⚠️', 'No trigger token configured. Add TRIGGER_TOKEN secret in GitHub.', 8000);
+      return;
+    }
+    const btn = document.getElementById('refresh-btn');
+    btn.disabled = true;
+    btn.innerHTML = '⏳ Starting scan…';
+    showToast('⏳', 'Scan started — brief will update in ~10 minutes.', 0);
+    fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/actions/workflows/${WORKFLOW_FILE}/dispatches`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `token ${GH_TOKEN}`,
+        'Accept': 'application/vnd.github.v3+json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ ref: 'main' })
+    })
+    .then(r => {
+      if (r.status === 204) {
+        showToast('✅', 'Scan running! Come back in ~10 min and refresh the page.', 0);
+        btn.innerHTML = '✅ Scan running…';
+        // Auto-reload the page after 12 minutes
+        setTimeout(() => location.reload(), 12 * 60 * 1000);
+      } else {
+        r.text().then(t => showToast('❌', `Error ${r.status}: ${t}`, 8000));
+        btn.disabled = false;
+        btn.innerHTML = '🔄 Refresh Brief';
+      }
+    })
+    .catch(e => {
+      showToast('❌', `Network error: ${e.message}`, 8000);
+      btn.disabled = false;
+      btn.innerHTML = '🔄 Refresh Brief';
+    });
+  }
+  // Close modal on backdrop click
+  document.getElementById('refresh-modal').addEventListener('click', e => {
+    if (e.target === document.getElementById('refresh-modal')) closeModal();
+  });
+</script>
+
+<nav class="topbar">
+  <div style="display:flex;align-items:center;gap:14px;">
+    <span style="font-size:20px;font-weight:700;color:#6c63ff;">🎹 Creative Brief</span>
+    <span style="background:#22263a;border:1px solid #2e3250;border-radius:20px;padding:3px 12px;font-size:12px;color:#8b90b5;">Tuesday, April 7, 2026</span>
+  </div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+    <a href="#new-ads" class="pill active">New Ads</a>
     <a href="#leaderboard" class="pill">Leaderboard</a>
-    <a href="#angles" class="pill">SP Angles</a>
+    <a href="#gap" class="pill">Gap Analysis</a>
+    <a href="#briefs" class="pill">SP Briefs</a>
     <a href="#trends" class="pill">Trends</a>
     <a href="#watchlist" class="pill">Watchlist</a>
+    
+    <button id="refresh-btn" onclick="openModal()">🔄 Refresh Brief</button>
   </div>
 </nav>
 
 <div class="container">
 
-  <!-- HERO STATS -->
   <div class="hero">
-    <div class="hero-stat">
-      <div class="num">7</div>
-      <div class="label">Brands Scanned</div>
-    </div>
-    <div class="hero-stat">
-      <div class="num">5</div>
-      <div class="label">Intelligence Signals</div>
-    </div>
-    <div class="hero-stat">
-      <div class="num">3</div>
-      <div class="label">Long-Running Winners</div>
-    </div>
-    <div class="hero-stat">
-      <div class="num">5</div>
-      <div class="label">SP Angles Generated</div>
-    </div>
+    <div class="hero-stat"><div class="num">7</div><div class="label">New Ads Today</div></div>
+    <div class="hero-stat"><div class="num">7</div><div class="label">Brands Scanned</div></div>
+    <div class="hero-stat"><div class="num">0</div><div class="label">Long-Running Winners</div></div>
+    <div class="hero-stat"><div class="num">4</div><div class="label">SP Briefs Generated</div></div>
   </div>
 
-  <div class="intel-banner">
-    <span>ℹ️</span>
-    <span><strong>Dry Run — April 6, 2026.</strong> Ad library visual captures require Chrome browser connection (in progress). Today's brief is intelligence-based: real competitor signals, messaging patterns, and hooks sourced from public data, ad tool indexes, and platform trend reports. Visual capture will be added once Chrome is connected.</span>
-  </div>
-
-  <!-- ── COMPETITOR INTELLIGENCE ── -->
-  <div id="intel">
+  <!-- NEW ADS -->
+  <div id="new-ads">
     <div class="section-header">
-      <h2>🔍 Competitor Intelligence</h2>
-      <span class="section-tag">5 signals found today</span>
+      <h2 style="font-size:18px;font-weight:600;">🆕 New Ads Found Today</h2>
+      <span style="background:#22263a;border:1px solid #2e3250;border-radius:20px;padding:2px 10px;font-size:11px;color:#8b90b5;">7 ads</span>
     </div>
-
-    <div class="filter-bar">
-      <span class="pill active" onclick="filterCards('all',this)">All</span>
-      <span class="pill" onclick="filterCards('direct',this)">Direct Competitors</span>
-      <span class="pill" onclick="filterCards('edtech',this)">EdTech</span>
-      <span class="pill" onclick="filterCards('trend',this)">Platform Trends</span>
-    </div>
-
     <div class="ad-grid">
-
-      <!-- CARD 1: FLOWKEY -->
-      <div class="ad-card" data-cat="direct">
-        <div class="ad-header">
-          <div class="ad-brand-icon">🎹</div>
-          <div>
-            <div class="ad-brand-name">Flowkey</div>
-            <div class="ad-platform-row">
-              <span class="platform-tag platform-tiktok">TikTok</span>
-              <span class="platform-tag platform-meta">Meta</span>
-            </div>
-          </div>
-        </div>
-        <div class="ad-signal">
-          <div class="ad-signal-label">Ad Hook Detected</div>
-          <div class="ad-signal-text">"It's never too late to start learning piano — whether you're coming back or starting fresh."</div>
-        </div>
-        <div class="ad-body">
-          <div class="ad-copy">Flowkey is confirmed running TikTok ads (indexed by PipiAds). Their SEO and ad content targets adult beginners with "learn songs you love" and free 7-day trial CTAs. Strong emphasis on Wait Mode (app pauses until you play the right note) as a differentiator. 10M+ users in social proof.</div>
-          <div class="ad-meta">
-            <span class="tag green">Active TikTok Ads</span>
-            <span class="tag">Free Trial CTA</span>
-            <span class="tag purple">Adult Beginners</span>
-            <span class="tag">"Learn songs you love"</span>
-          </div>
-          <div class="ad-actions">
-            <a href="https://www.facebook.com/ads/library/?active_status=active&ad_type=all&country=US&q=flowkey&search_type=keyword_unordered" target="_blank" class="btn btn-primary">🔗 View Live Ads</a>
-            <a href="https://www.tiktok.com/@flowkey" target="_blank" class="btn btn-secondary">TikTok →</a>
-          </div>
-        </div>
-      </div>
-
-      <!-- CARD 2: DUOLINGO -->
-      <div class="ad-card" data-cat="edtech">
-        <div class="ad-header">
-          <div class="ad-brand-icon">🦉</div>
-          <div>
-            <div class="ad-brand-name">Duolingo</div>
-            <div class="ad-platform-row">
-              <span class="platform-tag platform-tiktok">TikTok</span>
-              <span class="platform-tag platform-meta">Meta</span>
-            </div>
-          </div>
-        </div>
-        <div class="ad-signal">
-          <div class="ad-signal-label">🔥 Major Campaign Signal</div>
-          <div class="ad-signal-text">"Death of Duo" — killed their mascot on Feb 11. 144M views, 450 press articles. Biggest EdTech campaign of 2025.</div>
-        </div>
-        <div class="ad-body">
-          <div class="ad-copy">Duolingo's "Death of Duo" campaign is now the benchmark for narrative-driven app advertising. They bought just 5 seconds of TV airtime + a push notification — earning equivalent of 3 Super Bowl spots. New character-led mobile ad platform launched to help other brands use Duo-style formats. This is the creative playbook everyone will copy in 2026.</div>
-          <div class="ad-meta">
-            <span class="tag red">144M Views</span>
-            <span class="tag green">Earned Media Monster</span>
-            <span class="tag purple">Narrative Format</span>
-            <span class="tag yellow">25,560% mention spike</span>
-          </div>
-          <div class="ad-actions">
-            <a href="https://www.facebook.com/ads/library/?active_status=active&ad_type=all&country=US&q=duolingo&search_type=keyword_unordered" target="_blank" class="btn btn-primary">🔗 View Live Ads</a>
-            <a href="https://www.tiktok.com/@duolingo" target="_blank" class="btn btn-secondary">TikTok →</a>
-          </div>
-        </div>
-      </div>
-
-      <!-- CARD 3: YOUSICIAN -->
-      <div class="ad-card" data-cat="direct">
-        <div class="ad-header">
-          <div class="ad-brand-icon">🎸</div>
-          <div>
-            <div class="ad-brand-name">Yousician</div>
-            <div class="ad-platform-row">
-              <span class="platform-tag platform-meta">Meta</span>
-              <span class="platform-tag platform-tiktok">TikTok</span>
-            </div>
-          </div>
-        </div>
-        <div class="ad-signal">
-          <div class="ad-signal-label">Positioning Signal</div>
-          <div class="ad-signal-text">"Turn music learning into an engaging game — real-time feedback, instant results, family plan."</div>
-        </div>
-        <div class="ad-body">
-          <div class="ad-copy">Yousician positions strongly on gamification and the family plan angle — "play together, learn together." Microphone-based real-time feedback is their tech differentiator. Recommended for beginners with "some experience." Their ad angle gaps: weak on emotional storytelling, weak on 50+ segment. Opportunity for SP.</div>
-          <div class="ad-meta">
-            <span class="tag">Gamification</span>
-            <span class="tag purple">Family Plan Push</span>
-            <span class="tag">Real-time Feedback</span>
-          </div>
-          <div class="ad-actions">
-            <a href="https://www.facebook.com/ads/library/?active_status=active&ad_type=all&country=US&q=yousician&search_type=keyword_unordered" target="_blank" class="btn btn-primary">🔗 View Live Ads</a>
-            <a href="https://www.tiktok.com/@yousician" target="_blank" class="btn btn-secondary">TikTok →</a>
-          </div>
-        </div>
-      </div>
-
-      <!-- CARD 4: META ANDROMEDA -->
-      <div class="ad-card" data-cat="trend">
-        <div class="ad-header">
-          <div class="ad-brand-icon">📡</div>
-          <div>
-            <div class="ad-brand-name">Meta Platform Signal</div>
-            <div class="ad-platform-row">
-              <span class="platform-tag platform-meta">Meta Algorithm</span>
-            </div>
-          </div>
-        </div>
-        <div class="ad-signal">
-          <div class="ad-signal-label">⚡ Platform Shift Alert</div>
-          <div class="ad-signal-text">"Andromeda: Meta is no longer a media-buying platform — it's a creative discovery engine. Creative IS the targeting."</div>
-        </div>
-        <div class="ad-body">
-          <div class="ad-copy">Meta's Andromeda algorithm update is the biggest ad shift since iOS 14. Manual audience targeting is becoming obsolete — the algorithm reads your creative to decide who sees it. Winners in 2026 will have diverse creative libraries (10–20 variants), not narrow audiences. UGC-style and authentic content outperforms polished production. Static images still drive 60–70% of conversions.</div>
-          <div class="ad-meta">
-            <span class="tag red">Algorithm Shift</span>
-            <span class="tag yellow">Action Required</span>
-            <span class="tag green">UGC Wins</span>
-            <span class="tag">Static = 60-70% Conv.</span>
-          </div>
-          <div class="ad-actions">
-            <a href="https://www.anchour.com/articles/meta-ads-2026-playbook/" target="_blank" class="btn btn-primary">📖 Read Playbook</a>
-            <a href="https://scaledon.com/meta-andromeda-creatives-the-data-behind-the-biggest-ad-strategy-shift-in-2026/" target="_blank" class="btn btn-secondary">Data →</a>
-          </div>
-        </div>
-      </div>
-
-      <!-- CARD 5: TIKTOK PIANO TRENDS -->
-      <div class="ad-card" data-cat="trend">
-        <div class="ad-header">
-          <div class="ad-brand-icon">🎵</div>
-          <div>
-            <div class="ad-brand-name">TikTok Piano Trend</div>
-            <div class="ad-platform-row">
-              <span class="platform-tag platform-tiktok">TikTok Organic</span>
-            </div>
-          </div>
-        </div>
-        <div class="ad-signal">
-          <div class="ad-signal-label">Organic → Paid Signal</div>
-          <div class="ad-signal-text">Piano content is booming on TikTok. Trending song tutorials, prodigy videos, and "learn this in 30 days" formats drive massive organic reach.</div>
-        </div>
-        <div class="ad-body">
-          <div class="ad-copy">TikTok's #piano tag is one of the most consistently performing music hashtags. "Learn this song" tutorials and piano prodigy content regularly go viral. CPM on TikTok is $2.60–$6.60 vs Meta's $9–$15. Key insight: organic piano content predicts what ad formats will win next. Trending songs in Dec–Nov = piano search peaks = high intent window.</div>
-          <div class="ad-meta">
-            <span class="tag green">CPM $2.60–$6.60</span>
-            <span class="tag purple">#piano trending</span>
-            <span class="tag">"Learn in 30 days"</span>
-            <span class="tag yellow">Prodigy format viral</span>
-          </div>
-          <div class="ad-actions">
-            <a href="https://www.tiktok.com/tag/piano" target="_blank" class="btn btn-primary">🎵 View #piano</a>
-            <a href="https://ads.tiktok.com/business/creativecenter/inspiration/topads/pc/en" target="_blank" class="btn btn-secondary">Creative Center →</a>
-          </div>
-        </div>
-      </div>
-
+<div class="ad-card" style="background:#1a1d27;border:1px solid #2e3250;border-radius:12px;overflow:hidden;transition:all 0.2s;" onmouseover="this.style.borderColor='#6c63ff';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='#2e3250';this.style.transform='translateY(0)'">
+  <img src="assets/tiktok/top_ads/top_ad_0.png" style="width:100%;aspect-ratio:16/9;object-fit:cover;display:block;" alt="TikTok Top Ad ad" loading="lazy">
+  <div style="padding:14px 16px;">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;">
+      <span style="font-weight:700;font-size:14px;">TikTok Top Ad</span><span style="background:#6c63ff;color:#fff;border-radius:4px;padding:2px 8px;font-size:10px;font-weight:700;margin-left:6px;">NEW</span>
+      <span style="background:rgba(255,0,80,0.15);color:#ff0050;border-radius:4px;padding:2px 7px;font-size:10px;font-weight:700;">TikTok</span>
+      
+    </div>
+    <div style="background:#22263a;border-radius:6px;padding:8px 12px;margin-bottom:10px;font-size:12px;color:#e8eaf6;font-style:italic;border-left:3px solid #6c63ff;">The word 'Inspiration' appears boldly on a dark background with colorful accents, evoking the emotional aspiration of learning to play piano.</div>
+    <div style="font-size:12px;color:#8b90b5;margin-bottom:10px;line-height:1.6;">Inspiration</div>
+    <div style="font-size:11px;color:#8b90b5;margin-bottom:10px;">This appears to be a TikTok top ad thumbnail or opening frame using a minimalist dark background with bold white text 'Inspiration' and small pink/red accent elements. The ad relies on aspirational emotional framing rather than product features, likely serving as a hook frame before transitioning into a demo or testimonial in the video.</div>
+    <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px;">
+      <span style="background:rgba(108,99,255,0.1);border:1px solid #6c63ff;border-radius:4px;padding:2px 7px;font-size:10px;color:#6c63ff;">aspiration</span>
+      <span style="background:#22263a;border:1px solid #2e3250;border-radius:4px;padding:2px 7px;font-size:10px;color:#8b90b5;">lifestyle</span>
+      <span style="background:#22263a;border:1px solid #2e3250;border-radius:4px;padding:2px 7px;font-size:10px;color:#8b90b5;">Emotional connection to music</span> <span style="background:#22263a;border:1px solid #2e3250;border-radius:4px;padding:2px 7px;font-size:10px;color:#8b90b5;">Piano as a source of personal inspiration</span> <span style="background:#22263a;border:1px solid #2e3250;border-radius:4px;padding:2px 7px;font-size:10px;color:#8b90b5;">Simple and bold branding message</span> <span style="background:#22263a;border:1px solid #2e3250;border-radius:4px;padding:2px 7px;font-size:10px;color:#8b90b5;">Aspirational lifestyle positioning</span> 
+    </div>
+    <div style="display:flex;gap:8px;">
+      <a href="https://ads.tiktok.com/business/creativecenter/inspiration/topads/pc/en?period=7&region=US&industry=280001" target="_blank" style="flex:1;padding:8px;background:#6c63ff;color:#fff;border-radius:8px;font-size:12px;font-weight:600;text-align:center;text-decoration:none;">🔗 View Ad</a>
+      
     </div>
   </div>
+</div>
+<div class="ad-card" style="background:#1a1d27;border:1px solid #2e3250;border-radius:12px;overflow:hidden;transition:all 0.2s;" onmouseover="this.style.borderColor='#6c63ff';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='#2e3250';this.style.transform='translateY(0)'">
+  <img src="assets/google/flowkey/page_fallback.png" style="width:100%;aspect-ratio:16/9;object-fit:cover;display:block;" alt="Flowkey ad" loading="lazy">
+  <div style="padding:14px 16px;">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;">
+      <span style="font-weight:700;font-size:14px;">Flowkey</span><span style="background:#6c63ff;color:#fff;border-radius:4px;padding:2px 8px;font-size:10px;font-weight:700;margin-left:6px;">NEW</span>
+      <span style="background:rgba(255,0,0,0.15);color:#ff0000;border-radius:4px;padding:2px 7px;font-size:10px;font-weight:700;">Google/YouTube</span>
+      
+    </div>
+    <div style="background:#22263a;border-radius:6px;padding:8px 12px;margin-bottom:10px;font-size:12px;color:#e8eaf6;font-style:italic;border-left:3px solid #6c63ff;">Google Ads Transparency Center landing page showcasing ads transparency for a safe and open internet.</div>
+    <div style="font-size:12px;color:#8b90b5;margin-bottom:10px;line-height:1.6;">Google Ads Transparency page for flowkey. See screenshot.</div>
+    <div style="font-size:11px;color:#8b90b5;margin-bottom:10px;">This is not an actual Flowkey ad creative — it is a screenshot of the Google Ads Transparency Center homepage, likely captured while searching for Flowkey's ads. No Flowkey ad content is visible, so no competitive creative insights can be extracted from this image.</div>
+    <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px;">
+      <span style="background:rgba(108,99,255,0.1);border:1px solid #6c63ff;border-radius:4px;padding:2px 7px;font-size:10px;color:#6c63ff;">curiosity</span>
+      <span style="background:#22263a;border:1px solid #2e3250;border-radius:4px;padding:2px 7px;font-size:10px;color:#8b90b5;">product_showcase</span>
+      <span style="background:#22263a;border:1px solid #2e3250;border-radius:4px;padding:2px 7px;font-size:10px;color:#8b90b5;">Ads transparency and openness</span> <span style="background:#22263a;border:1px solid #2e3250;border-radius:4px;padding:2px 7px;font-size:10px;color:#8b90b5;">Ability to search for active ads by advertiser name or website</span> <span style="background:#22263a;border:1px solid #2e3250;border-radius:4px;padding:2px 7px;font-size:10px;color:#8b90b5;">Filter by political ads or all topics</span> <span style="background:#22263a;border:1px solid #2e3250;border-radius:4px;padding:2px 7px;font-size:10px;color:#8b90b5;">Geographic targeting visibility (Ads in United States)</span> 
+    </div>
+    <div style="display:flex;gap:8px;">
+      <a href="https://adstransparency.google.com/?region=US&query=flowkey" target="_blank" style="flex:1;padding:8px;background:#6c63ff;color:#fff;border-radius:8px;font-size:12px;font-weight:600;text-align:center;text-decoration:none;">🔗 View Ad</a>
+      
+    </div>
+  </div>
+</div>
+<div class="ad-card" style="background:#1a1d27;border:1px solid #2e3250;border-radius:12px;overflow:hidden;transition:all 0.2s;" onmouseover="this.style.borderColor='#6c63ff';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='#2e3250';this.style.transform='translateY(0)'">
+  <img src="assets/google/yousician/page_fallback.png" style="width:100%;aspect-ratio:16/9;object-fit:cover;display:block;" alt="Yousician ad" loading="lazy">
+  <div style="padding:14px 16px;">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;">
+      <span style="font-weight:700;font-size:14px;">Yousician</span><span style="background:#6c63ff;color:#fff;border-radius:4px;padding:2px 8px;font-size:10px;font-weight:700;margin-left:6px;">NEW</span>
+      <span style="background:rgba(255,0,0,0.15);color:#ff0000;border-radius:4px;padding:2px 7px;font-size:10px;font-weight:700;">Google/YouTube</span>
+      
+    </div>
+    <div style="background:#22263a;border-radius:6px;padding:8px 12px;margin-bottom:10px;font-size:12px;color:#e8eaf6;font-style:italic;border-left:3px solid #6c63ff;">Google Ads Transparency Center landing page showcasing Yousician's ad presence with the tagline 'Ads transparency for a safe and open internet'.</div>
+    <div style="font-size:12px;color:#8b90b5;margin-bottom:10px;line-height:1.6;">Google Ads Transparency page for yousician. See screenshot.</div>
+    <div style="font-size:11px;color:#8b90b5;margin-bottom:10px;">This is not an actual Yousician ad but rather a screenshot of the Google Ads Transparency Center homepage. No specific Yousician ad creative or copy is visible, suggesting the search for Yousician ads was not yet executed or no active ads were found at the time of capture.</div>
+    <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px;">
+      <span style="background:rgba(108,99,255,0.1);border:1px solid #6c63ff;border-radius:4px;padding:2px 7px;font-size:10px;color:#6c63ff;">curiosity</span>
+      <span style="background:#22263a;border:1px solid #2e3250;border-radius:4px;padding:2px 7px;font-size:10px;color:#8b90b5;">product_showcase</span>
+      <span style="background:#22263a;border:1px solid #2e3250;border-radius:4px;padding:2px 7px;font-size:10px;color:#8b90b5;">Brand visibility through Google Ads Transparency Center</span> <span style="background:#22263a;border:1px solid #2e3250;border-radius:4px;padding:2px 7px;font-size:10px;color:#8b90b5;">Active advertising presence on Google/YouTube platforms</span> <span style="background:#22263a;border:1px solid #2e3250;border-radius:4px;padding:2px 7px;font-size:10px;color:#8b90b5;">Competitor positioning in the music learning app space</span> 
+    </div>
+    <div style="display:flex;gap:8px;">
+      <a href="https://adstransparency.google.com/?region=US&query=yousician" target="_blank" style="flex:1;padding:8px;background:#6c63ff;color:#fff;border-radius:8px;font-size:12px;font-weight:600;text-align:center;text-decoration:none;">🔗 View Ad</a>
+      
+    </div>
+  </div>
+</div>
+<div class="ad-card" style="background:#1a1d27;border:1px solid #2e3250;border-radius:12px;overflow:hidden;transition:all 0.2s;" onmouseover="this.style.borderColor='#6c63ff';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='#2e3250';this.style.transform='translateY(0)'">
+  <img src="assets/google/fender_play/page_fallback.png" style="width:100%;aspect-ratio:16/9;object-fit:cover;display:block;" alt="Fender Play ad" loading="lazy">
+  <div style="padding:14px 16px;">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;">
+      <span style="font-weight:700;font-size:14px;">Fender Play</span><span style="background:#6c63ff;color:#fff;border-radius:4px;padding:2px 8px;font-size:10px;font-weight:700;margin-left:6px;">NEW</span>
+      <span style="background:rgba(255,0,0,0.15);color:#ff0000;border-radius:4px;padding:2px 7px;font-size:10px;font-weight:700;">Google/YouTube</span>
+      
+    </div>
+    <div style="background:#22263a;border-radius:6px;padding:8px 12px;margin-bottom:10px;font-size:12px;color:#e8eaf6;font-style:italic;border-left:3px solid #6c63ff;">Google Ads Transparency Center landing page showcasing Fender Play's advertising presence with no specific ad creative visible.</div>
+    <div style="font-size:12px;color:#8b90b5;margin-bottom:10px;line-height:1.6;">Google Ads Transparency page for fender play. See screenshot.</div>
+    <div style="font-size:11px;color:#8b90b5;margin-bottom:10px;">This screenshot shows the Google Ads Transparency Center homepage rather than an actual Fender Play ad creative. No specific ad copy, visuals, or campaign details for Fender Play are visible, making competitive analysis of their messaging limited. The search may not have been executed yet to reveal actual Fender Play ads.</div>
+    <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px;">
+      <span style="background:rgba(108,99,255,0.1);border:1px solid #6c63ff;border-radius:4px;padding:2px 7px;font-size:10px;color:#6c63ff;">curiosity</span>
+      <span style="background:#22263a;border:1px solid #2e3250;border-radius:4px;padding:2px 7px;font-size:10px;color:#8b90b5;">product_showcase</span>
+      <span style="background:#22263a;border:1px solid #2e3250;border-radius:4px;padding:2px 7px;font-size:10px;color:#8b90b5;">Brand awareness through Google Ads ecosystem</span> <span style="background:#22263a;border:1px solid #2e3250;border-radius:4px;padding:2px 7px;font-size:10px;color:#8b90b5;">Leveraging Fender brand recognition for music learning</span> <span style="background:#22263a;border:1px solid #2e3250;border-radius:4px;padding:2px 7px;font-size:10px;color:#8b90b5;">Presence in United States ad market</span> 
+    </div>
+    <div style="display:flex;gap:8px;">
+      <a href="https://adstransparency.google.com/?region=US&query=fender+play" target="_blank" style="flex:1;padding:8px;background:#6c63ff;color:#fff;border-radius:8px;font-size:12px;font-weight:600;text-align:center;text-decoration:none;">🔗 View Ad</a>
+      
+    </div>
+  </div>
+</div>
+<div class="ad-card" style="background:#1a1d27;border:1px solid #2e3250;border-radius:12px;overflow:hidden;transition:all 0.2s;" onmouseover="this.style.borderColor='#6c63ff';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='#2e3250';this.style.transform='translateY(0)'">
+  <img src="assets/google/pianote/page_fallback.png" style="width:100%;aspect-ratio:16/9;object-fit:cover;display:block;" alt="Pianote ad" loading="lazy">
+  <div style="padding:14px 16px;">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;">
+      <span style="font-weight:700;font-size:14px;">Pianote</span><span style="background:#6c63ff;color:#fff;border-radius:4px;padding:2px 8px;font-size:10px;font-weight:700;margin-left:6px;">NEW</span>
+      <span style="background:rgba(255,0,0,0.15);color:#ff0000;border-radius:4px;padding:2px 7px;font-size:10px;font-weight:700;">Google/YouTube</span>
+      
+    </div>
+    <div style="background:#22263a;border-radius:6px;padding:8px 12px;margin-bottom:10px;font-size:12px;color:#e8eaf6;font-style:italic;border-left:3px solid #6c63ff;">Google Ads Transparency Center landing page showcasing Pianote's ad presence with the tagline 'Ads transparency for a safe and open internet'.</div>
+    <div style="font-size:12px;color:#8b90b5;margin-bottom:10px;line-height:1.6;">Google Ads Transparency page for pianote. See screenshot.</div>
+    <div style="font-size:11px;color:#8b90b5;margin-bottom:10px;">This is not an actual Pianote ad but rather a screenshot of the Google Ads Transparency Center homepage. No specific Pianote ad creative or copy is visible — it appears the search for Pianote's ads was not yet executed, so no competitive intelligence on their actual messaging can be extracted from this image.</div>
+    <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px;">
+      <span style="background:rgba(108,99,255,0.1);border:1px solid #6c63ff;border-radius:4px;padding:2px 7px;font-size:10px;color:#6c63ff;">curiosity</span>
+      <span style="background:#22263a;border:1px solid #2e3250;border-radius:4px;padding:2px 7px;font-size:10px;color:#8b90b5;">product_showcase</span>
+      <span style="background:#22263a;border:1px solid #2e3250;border-radius:4px;padding:2px 7px;font-size:10px;color:#8b90b5;">Brand visibility through Google Ads ecosystem</span> <span style="background:#22263a;border:1px solid #2e3250;border-radius:4px;padding:2px 7px;font-size:10px;color:#8b90b5;">Active advertising presence on Google/YouTube platforms</span> <span style="background:#22263a;border:1px solid #2e3250;border-radius:4px;padding:2px 7px;font-size:10px;color:#8b90b5;">Competitor positioning in the online piano learning space</span> 
+    </div>
+    <div style="display:flex;gap:8px;">
+      <a href="https://adstransparency.google.com/?region=US&query=pianote" target="_blank" style="flex:1;padding:8px;background:#6c63ff;color:#fff;border-radius:8px;font-size:12px;font-weight:600;text-align:center;text-decoration:none;">🔗 View Ad</a>
+      
+    </div>
+  </div>
+</div>
+<div class="ad-card" style="background:#1a1d27;border:1px solid #2e3250;border-radius:12px;overflow:hidden;transition:all 0.2s;" onmouseover="this.style.borderColor='#6c63ff';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='#2e3250';this.style.transform='translateY(0)'">
+  <img src="assets/google/duolingo/page_fallback.png" style="width:100%;aspect-ratio:16/9;object-fit:cover;display:block;" alt="Duolingo ad" loading="lazy">
+  <div style="padding:14px 16px;">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;">
+      <span style="font-weight:700;font-size:14px;">Duolingo</span><span style="background:#6c63ff;color:#fff;border-radius:4px;padding:2px 8px;font-size:10px;font-weight:700;margin-left:6px;">NEW</span>
+      <span style="background:rgba(255,0,0,0.15);color:#ff0000;border-radius:4px;padding:2px 7px;font-size:10px;font-weight:700;">Google/YouTube</span>
+      
+    </div>
+    <div style="background:#22263a;border-radius:6px;padding:8px 12px;margin-bottom:10px;font-size:12px;color:#e8eaf6;font-style:italic;border-left:3px solid #6c63ff;">Google Ads Transparency Center landing page showcasing Duolingo's ad presence with the tagline 'Ads transparency for a safe and open internet'.</div>
+    <div style="font-size:12px;color:#8b90b5;margin-bottom:10px;line-height:1.6;">Google Ads Transparency page for duolingo. See screenshot.</div>
+    <div style="font-size:11px;color:#8b90b5;margin-bottom:10px;">This is not an actual Duolingo ad but rather the Google Ads Transparency Center landing page showing where Duolingo's ads can be searched. No specific Duolingo ad creative is visible — this only confirms Duolingo is running ads through Google's network, making competitive intelligence limited from this screenshot alone.</div>
+    <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px;">
+      <span style="background:rgba(108,99,255,0.1);border:1px solid #6c63ff;border-radius:4px;padding:2px 7px;font-size:10px;color:#6c63ff;">curiosity</span>
+      <span style="background:#22263a;border:1px solid #2e3250;border-radius:4px;padding:2px 7px;font-size:10px;color:#8b90b5;">product_showcase</span>
+      <span style="background:#22263a;border:1px solid #2e3250;border-radius:4px;padding:2px 7px;font-size:10px;color:#8b90b5;">Brand awareness through Google Ads ecosystem</span> <span style="background:#22263a;border:1px solid #2e3250;border-radius:4px;padding:2px 7px;font-size:10px;color:#8b90b5;">Broad visibility across Google and YouTube platforms</span> <span style="background:#22263a;border:1px solid #2e3250;border-radius:4px;padding:2px 7px;font-size:10px;color:#8b90b5;">Transparent advertising presence in the United States market</span> 
+    </div>
+    <div style="display:flex;gap:8px;">
+      <a href="https://adstransparency.google.com/?region=US&query=duolingo" target="_blank" style="flex:1;padding:8px;background:#6c63ff;color:#fff;border-radius:8px;font-size:12px;font-weight:600;text-align:center;text-decoration:none;">🔗 View Ad</a>
+      
+    </div>
+  </div>
+</div>
+<div class="ad-card" style="background:#1a1d27;border:1px solid #2e3250;border-radius:12px;overflow:hidden;transition:all 0.2s;" onmouseover="this.style.borderColor='#6c63ff';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='#2e3250';this.style.transform='translateY(0)'">
+  <img src="assets/google/masterclass/page_fallback.png" style="width:100%;aspect-ratio:16/9;object-fit:cover;display:block;" alt="Masterclass ad" loading="lazy">
+  <div style="padding:14px 16px;">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;">
+      <span style="font-weight:700;font-size:14px;">Masterclass</span><span style="background:#6c63ff;color:#fff;border-radius:4px;padding:2px 8px;font-size:10px;font-weight:700;margin-left:6px;">NEW</span>
+      <span style="background:rgba(255,0,0,0.15);color:#ff0000;border-radius:4px;padding:2px 7px;font-size:10px;font-weight:700;">Google/YouTube</span>
+      
+    </div>
+    <div style="background:#22263a;border-radius:6px;padding:8px 12px;margin-bottom:10px;font-size:12px;color:#e8eaf6;font-style:italic;border-left:3px solid #6c63ff;">Google Ads Transparency Center landing page showcasing ad transparency for a safe and open internet.</div>
+    <div style="font-size:12px;color:#8b90b5;margin-bottom:10px;line-height:1.6;">Google Ads Transparency page for masterclass. See screenshot.</div>
+    <div style="font-size:11px;color:#8b90b5;margin-bottom:10px;">This is not an actual Masterclass ad — it is a screenshot of the Google Ads Transparency Center homepage itself, not a competitor creative for Simply Piano. No Masterclass or Simply Piano ad content is visible. The image appears to be a misattributed or incorrectly captured screenshot with no actionable competitor intelligence.</div>
+    <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px;">
+      <span style="background:rgba(108,99,255,0.1);border:1px solid #6c63ff;border-radius:4px;padding:2px 7px;font-size:10px;color:#6c63ff;">curiosity</span>
+      <span style="background:#22263a;border:1px solid #2e3250;border-radius:4px;padding:2px 7px;font-size:10px;color:#8b90b5;">product_showcase</span>
+      <span style="background:#22263a;border:1px solid #2e3250;border-radius:4px;padding:2px 7px;font-size:10px;color:#8b90b5;">Ad transparency and openness</span> <span style="background:#22263a;border:1px solid #2e3250;border-radius:4px;padding:2px 7px;font-size:10px;color:#8b90b5;">Ability to search active ads by advertiser name or website</span> <span style="background:#22263a;border:1px solid #2e3250;border-radius:4px;padding:2px 7px;font-size:10px;color:#8b90b5;">Filter by political ads or all topics</span> <span style="background:#22263a;border:1px solid #2e3250;border-radius:4px;padding:2px 7px;font-size:10px;color:#8b90b5;">Geo-targeted ads filtering (United States)</span> 
+    </div>
+    <div style="display:flex;gap:8px;">
+      <a href="https://adstransparency.google.com/?region=US&query=masterclass" target="_blank" style="flex:1;padding:8px;background:#6c63ff;color:#fff;border-radius:8px;font-size:12px;font-weight:600;text-align:center;text-decoration:none;">🔗 View Ad</a>
+      
+    </div>
+  </div>
+</div></div>
+  </div>
 
-  <!-- ── LONGEVITY LEADERBOARD ── -->
+  <!-- LEADERBOARD -->
   <div id="leaderboard">
     <div class="section-header">
-      <h2>🏆 Longevity Leaderboard</h2>
-      <span class="section-tag">Ads running 30+ days = profitable signal</span>
+      <h2 style="font-size:18px;font-weight:600;">🏆 Longevity Leaderboard</h2>
+      <span style="background:#22263a;border:1px solid #2e3250;border-radius:20px;padding:2px 10px;font-size:11px;color:#8b90b5;">30+ days = profitable signal</span>
     </div>
-    <p style="color:var(--muted); font-size:13px; margin-bottom:20px;">First scan baseline — brands confirmed as consistent long-term advertisers based on public data. Day counts will become precise once daily visual capture is live.</p>
-    <div class="leaderboard">
-
-      <div class="lb-row">
-        <div class="lb-rank">#1</div>
-        <div class="lb-icon">🦉</div>
-        <div class="lb-info">
-          <div class="lb-brand">Duolingo</div>
-          <div class="lb-why">Permanent advertiser across Meta + TikTok. "Death of Duo" ran Feb 11–25. New character-led ad platform now ongoing. Never stops spending.</div>
-        </div>
-        <div class="lb-right">
-          <span class="longevity-pill">Always On</span>
-          <div style="font-size:11px; color:var(--muted);">Meta + TikTok + YouTube</div>
-        </div>
-      </div>
-
-      <div class="lb-row">
-        <div class="lb-rank">#2</div>
-        <div class="lb-icon">🎹</div>
-        <div class="lb-info">
-          <div class="lb-brand">Flowkey</div>
-          <div class="lb-why">Active TikTok campaigns confirmed running (indexed by PipiAds). "Never too late" + "songs you love" messaging consistent across quarters. Free trial funnel always live.</div>
-        </div>
-        <div class="lb-right">
-          <span class="longevity-pill warn">Long-Running</span>
-          <div style="font-size:11px; color:var(--muted);">TikTok + Meta</div>
-        </div>
-      </div>
-
-      <div class="lb-row">
-        <div class="lb-rank">#3</div>
-        <div class="lb-icon">🌍</div>
-        <div class="lb-info">
-          <div class="lb-brand">Rosetta Stone</div>
-          <div class="lb-why">One of the most consistent 50+ audience advertisers in EdTech. Brand has been advertising online for 15+ years. Always has active Meta campaigns targeting adults 45+.</div>
-        </div>
-        <div class="lb-right">
-          <span class="longevity-pill">Always On</span>
-          <div style="font-size:11px; color:var(--muted);">Meta + YouTube</div>
-        </div>
-      </div>
-
-    </div>
+    <div style="display:flex;flex-direction:column;gap:10px;"><div style="text-align:center;padding:32px;color:#8b90b5;border:1px dashed #2e3250;border-radius:12px;">Longevity data builds after 30 days of scanning. Check back soon.</div></div>
   </div>
 
-  <!-- ── SP ANGLES ── -->
-  <div id="angles">
+  <!-- GAP ANALYSIS -->
+  <div id="gap">
     <div class="section-header">
-      <h2>💡 Simply Piano Angles</h2>
-      <span class="section-tag">5 angles from today's intelligence</span>
+      <h2 style="font-size:18px;font-weight:600;">🎯 SP Gap Analysis</h2>
+      <span style="background:#22263a;border:1px solid #2e3250;border-radius:20px;padding:2px 10px;font-size:11px;color:#8b90b5;">vs competitor field</span>
     </div>
-    <div class="angles-grid">
-
-      <div class="angle-card">
-        <div class="angle-num">Angle 01 — Inspired by Duolingo's Narrative Format</div>
-        <div class="angle-title">Give Simply Piano a Story Arc</div>
-        <div class="angle-desc">Duolingo's biggest win wasn't an ad — it was a narrative people wanted to follow. Simply Piano has a natural story: the app was literally designed to be "simple." That's a personality, not just a product name. Build a character or persona around it — the patient teacher, the app that never judges, the one that waited for you to come back.</div>
-        <div class="angle-hook">"You came back. We saved your spot. Let's pick up where you left off."</div>
-        <div class="angle-source">Signal: Duolingo "Death of Duo" — 144M views, narrative > product demo</div>
+    <div style="background:#22263a;border-radius:10px;padding:14px 18px;margin-bottom:20px;font-size:13px;color:#8b90b5;line-height:1.7;">Competitors are winning the emotional and aspirational narrative — framing piano as identity and inspiration — while Simply Piano leads on functional differentiation like real-time feedback, gamification, and device compatibility. The biggest strategic gap is that SP sells a tool while competitors sell a feeling. SP should layer emotional storytelling on top of its unique tech features, pairing 'here's what it feels like' with 'here's why only we can get you there,' and invest in bold, simple creative that cuts through an increasingly saturated ad ecosystem.</div>
+    <div class="gap-grid">
+      <div>
+        <div style="font-size:12px;color:#ff6584;font-weight:700;margin-bottom:12px;text-transform:uppercase;letter-spacing:0.5px;">⚠️ Angles SP Is Missing</div>
+        <div style="background:#1a1d27;border:1px solid #2e3250;border-left:3px solid #ff6584;border-radius:8px;padding:12px 16px;margin-bottom:8px;"><div style="font-weight:600;font-size:13px;">Emotional connection to music</div><div style="font-size:12px;color:#8b90b5;margin-top:3px;">SP focuses on mechanics and features but should lean into the emotional transformation — the joy, pride, and identity shift that comes from playing piano.</div><span style="font-size:10px;color:#ff6584;">high</span></div><div style="background:#1a1d27;border:1px solid #2e3250;border-left:3px solid #ff6584;border-radius:8px;padding:12px 16px;margin-bottom:8px;"><div style="font-weight:600;font-size:13px;">Aspirational lifestyle positioning</div><div style="font-size:12px;color:#8b90b5;margin-top:3px;">Competitors frame piano learning as a lifestyle upgrade; SP should show learners becoming 'the person who plays piano' at gatherings, for relaxation, or self-expression.</div><span style="font-size:10px;color:#ff6584;">medium</span></div><div style="background:#1a1d27;border:1px solid #2e3250;border-left:3px solid #ff6584;border-radius:8px;padding:12px 16px;margin-bottom:8px;"><div style="font-weight:600;font-size:13px;">Piano as a source of personal inspiration</div><div style="font-size:12px;color:#8b90b5;margin-top:3px;">SP can create ad narratives around moments of breakthrough and personal meaning — not just skill acquisition but finding purpose and creativity.</div><span style="font-size:10px;color:#ff6584;">medium</span></div><div style="background:#1a1d27;border:1px solid #2e3250;border-left:3px solid #ff6584;border-radius:8px;padding:12px 16px;margin-bottom:8px;"><div style="font-weight:600;font-size:13px;">Simple and bold branding message</div><div style="font-size:12px;color:#8b90b5;margin-top:3px;">Competitors use punchy, memorable brand statements; SP should test minimalist hero ads with one powerful line (e.g., 'You. A piano. Tonight.') instead of feature lists.</div><span style="font-size:10px;color:#ff6584;">medium</span></div><div style="background:#1a1d27;border:1px solid #2e3250;border-left:3px solid #ff6584;border-radius:8px;padding:12px 16px;margin-bottom:8px;"><div style="font-weight:600;font-size:13px;">Leveraging established brand recognition for music learning</div><div style="font-size:12px;color:#8b90b5;margin-top:3px;">Competitors like Fender bring brand heritage into learning; SP should amplify its JoyTunes/parent brand credibility or pursue co-branding with instrument makers or artists.</div><span style="font-size:10px;color:#ff6584;">low</span></div>
       </div>
-
-      <div class="angle-card">
-        <div class="angle-num">Angle 02 — Counter Flowkey's "Never Too Late"</div>
-        <div class="angle-title">Own the 50+ Moment — But Do It Better</div>
-        <div class="angle-desc">Flowkey uses "never too late" as a generic message. SP can own this segment with specificity: you have the time now, you have the brain, and this was literally designed so you don't need to be tech-savvy. Show people who look aspirational (under 40 visually), playing songs from the 70s–80s. Don't say "seniors" — say "this is your season."</div>
-        <div class="angle-hook">"You spent 40 years wishing you played piano. You now have the time. This is how it's done in 2026."</div>
-        <div class="angle-source">Signal: Flowkey adult messaging + 50+ tech adoption surge (90% smartphone ownership in 2025)</div>
+      <div>
+        <div style="font-size:12px;color:#3ecf8e;font-weight:700;margin-bottom:12px;text-transform:uppercase;letter-spacing:0.5px;">✅ Only SP Does This — Protect It</div>
+        <div style="background:#1a1d27;border:1px solid #2e3250;border-left:3px solid #3ecf8e;border-radius:8px;padding:12px 16px;margin-bottom:8px;"><div style="font-weight:600;font-size:13px;">Real-time feedback</div><div style="font-size:12px;color:#8b90b5;margin-top:3px;">This is a powerful tech differentiator — amplify it with demo-style video ads that show the instant feedback loop in action, making it feel magical and addictive.</div></div><div style="background:#1a1d27;border:1px solid #2e3250;border-left:3px solid #3ecf8e;border-radius:8px;padding:12px 16px;margin-bottom:8px;"><div style="font-weight:600;font-size:13px;">Works with any piano or keyboard</div><div style="font-size:12px;color:#8b90b5;margin-top:3px;">Highlight this as a zero-barrier-to-entry message — pair it with affordability messaging like 'Got a $50 keyboard? You're ready' to neutralize equipment objections.</div></div><div style="background:#1a1d27;border:1px solid #2e3250;border-left:3px solid #3ecf8e;border-radius:8px;padding:12px 16px;margin-bottom:8px;"><div style="font-weight:600;font-size:13px;">Fun gamified progression</div><div style="font-size:12px;color:#8b90b5;margin-top:3px;">Double down on this in short-form video by showing streak counts, level-ups, and unlock moments that trigger dopamine — make it look as addictive as a game, not a lesson.</div></div><div style="background:#1a1d27;border:1px solid #2e3250;border-left:3px solid #3ecf8e;border-radius:8px;padding:12px 16px;margin-bottom:8px;"><div style="font-weight:600;font-size:13px;">Step-by-step guidance</div><div style="font-size:12px;color:#8b90b5;margin-top:3px;">Position this against competitor overwhelm — use messaging like 'No music theory degree needed' to make SP feel like the friendliest on-ramp.</div></div>
       </div>
-
-      <div class="angle-card">
-        <div class="angle-num">Angle 03 — Exploit the Andromeda Shift</div>
-        <div class="angle-title">Build a Creative Library, Not One Hero Ad</div>
-        <div class="angle-desc">With Meta's Andromeda update, targeting is dead — creative is the signal. SP needs 10–20 variants testing different hooks, tones, and angles simultaneously. The algorithm finds the audience; your job is to give it enough creative diversity to work with. One great ad is not enough in 2026. A library of 15 authentic variants is the new media buy.</div>
-        <div class="angle-hook">Brief: 3 hooks × 3 formats × 2 audiences = 18 variants from one shoot day</div>
-        <div class="angle-source">Signal: Meta Andromeda algorithm — creative = targeting, UGC wins, static drives 60-70% conversions</div>
-      </div>
-
-      <div class="angle-card">
-        <div class="angle-num">Angle 04 — Ride the TikTok Piano Wave</div>
-        <div class="angle-title">Hijack Trending Songs as Ad Hooks</div>
-        <div class="angle-desc">TikTok's #piano tag is organic gold. Viral piano content (trending song tutorials, "learn in 30 days") consistently outperforms on TikTok. SP should run ads that look like organic piano content — someone learning a trending song, showing progress, using the app naturally. The hook IS the song, not the app pitch. CPM is 3–4x cheaper than Meta.</div>
-        <div class="angle-hook">"I learned [viral TikTok song] in 2 weeks with Simply Piano. Here's day 1 vs day 14."</div>
-        <div class="angle-source">Signal: TikTok #piano organic trends, $2.60–$6.60 CPM vs Meta $9–$15</div>
-      </div>
-
-      <div class="angle-card">
-        <div class="angle-num">Angle 05 — Fill Yousician's Gap</div>
-        <div class="angle-title">Emotional Over Gamified — The Anti-Game Angle</div>
-        <div class="angle-desc">Yousician's positioning is heavily gamified. That leaves a clear gap: adults (especially 35+) don't want to feel like they're playing a video game — they want to feel like they're actually learning a real skill. SP's angle: "This isn't a game. This is the real thing. You'll actually play piano." Position against the toy-like feel of competitors and own the "serious beginner" space.</div>
-        <div class="angle-hook">"Not a game. Not a toy. Simply Piano teaches you to actually play — the real songs, the right way."</div>
-        <div class="angle-source">Signal: Yousician gap analysis — strong on gamification, weak on emotional credibility for adults 35+</div>
-      </div>
-
     </div>
   </div>
 
-  <!-- ── PLATFORM TRENDS ── -->
+  <!-- CREATIVE BRIEFS -->
+  <div id="briefs">
+    <div class="section-header">
+      <h2 style="font-size:18px;font-weight:600;">✍️ SP Creative Briefs</h2>
+      <span style="background:#22263a;border:1px solid #2e3250;border-radius:20px;padding:2px 10px;font-size:11px;color:#8b90b5;">One per segment + 1 original idea</span>
+    </div>
+    <div class="briefs-grid">
+<div style="background:#1a1d27;border:1px solid #2e3250;border-left:4px solid #6c63ff;border-radius:12px;padding:22px 24px;">
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+    <span style="background:rgba(108,99,255,0.1);border:1px solid #6c63ff;border-radius:20px;padding:3px 12px;font-size:11px;color:#6c63ff;font-weight:600;">50+ Adults</span>
+    <span style="font-size:11px;color:#8b90b5;">ref: TikTok Top Ad / TikTok</span>
+  </div>
+  <div style="font-size:12px;color:#8b90b5;margin-bottom:12px;padding:10px 14px;background:#22263a;border-radius:8px;"><strong style="color:#e8eaf6;">What makes it work:</strong> The bold, minimalist 'Inspiration' frame taps into a deep emotional aspiration — the dream of playing piano — before showing anything about the product. It earns attention through feeling rather than features, which resonates strongly with adults who've waited decades to pursue a passion.</div>
+  <div style="font-size:13px;color:#8b90b5;margin-bottom:14px;line-height:1.7;">Keep the aspirational, emotion-first opening that leads with a feeling rather than a product demo. Change the abstract branding to a relatable human story — show a confident, attractive person in their mid-30s sitting down at a piano for the first time and playing a recognizable 70s/80s hit within moments. Add a 'Free Trial — Learn at Your Own Pace' badge and a calm, self-paced tone that removes any pressure or tech intimidation.</div>
+  <div style="background:#22263a;border-radius:8px;padding:14px 16px;margin-bottom:12px;">
+    <div style="font-size:10px;color:#8b90b5;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">HEADLINE</div>
+    <div style="font-size:16px;font-weight:700;color:#e8eaf6;">You Finally Have the Time. Now Play the Songs You've Always Loved.</div>
+  </div>
+  <div style="background:#22263a;border-radius:8px;padding:12px 16px;margin-bottom:10px;">
+    <div style="font-size:10px;color:#8b90b5;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">HOOK / OPENING</div>
+    <div style="font-size:13px;color:#e8eaf6;font-style:italic;">"You told yourself 'someday.' [pause] Someday is today."</div>
+  </div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;">
+    <div style="flex:1;background:#22263a;border-radius:8px;padding:10px 14px;min-width:140px;">
+      <div style="font-size:10px;color:#8b90b5;margin-bottom:3px;">VISUAL</div>
+      <div style="font-size:12px;color:#e8eaf6;">Warm, softly-lit living room; a relaxed, aspirational adult (mid-30s) sits at an upright piano, smiles as they play the opening notes of 'Piano Man' with the Simply Piano app glowing gently on a tablet beside them.</div>
+    </div>
+    <div style="background:#22263a;border-radius:8px;padding:10px 14px;">
+      <div style="font-size:10px;color:#8b90b5;margin-bottom:3px;">CTA</div>
+      <div style="font-size:13px;font-weight:700;color:#6c63ff;">Start Your Free Trial</div>
+    </div>
+  </div>
+</div>
+<div style="background:#1a1d27;border:1px solid #2e3250;border-left:4px solid #6c63ff;border-radius:12px;padding:22px 24px;">
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+    <span style="background:rgba(108,99,255,0.1);border:1px solid #6c63ff;border-radius:20px;padding:3px 12px;font-size:11px;color:#6c63ff;font-weight:600;">Parents & Kids</span>
+    <span style="font-size:11px;color:#8b90b5;">ref: TikTok Top Ad / TikTok</span>
+  </div>
+  <div style="font-size:12px;color:#8b90b5;margin-bottom:12px;padding:10px 14px;background:#22263a;border-radius:8px;"><strong style="color:#e8eaf6;">What makes it work:</strong> The emotional, aspiration-driven hook captures attention instantly without relying on product UI, proving that leading with a feeling outperforms leading with features. The bold simplicity makes it thumb-stopping even in a fast-scroll environment.</div>
+  <div style="font-size:13px;color:#8b90b5;margin-bottom:14px;line-height:1.7;">Keep the emotion-first hook but reframe aspiration around family bonding — the magic of a parent and child learning something together. Change the solo, abstract mood to a lively, heartwarming scene of a parent and kid high-fiving after nailing a song together. Add visible progress tracking (stars, streaks) and a 'show-off moment' where the child proudly performs for family, making it clear this is structured fun, not just screen time.</div>
+  <div style="background:#22263a;border-radius:8px;padding:14px 16px;margin-bottom:12px;">
+    <div style="font-size:10px;color:#8b90b5;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">HEADLINE</div>
+    <div style="font-size:16px;font-weight:700;color:#e8eaf6;">The Best Thing You'll Ever Do Together Starts with One Note.</div>
+  </div>
+  <div style="background:#22263a;border-radius:8px;padding:12px 16px;margin-bottom:10px;">
+    <div style="font-size:10px;color:#8b90b5;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">HOOK / OPENING</div>
+    <div style="font-size:13px;color:#e8eaf6;font-style:italic;">"What if screen time actually brought your family closer?"</div>
+  </div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;">
+    <div style="flex:1;background:#22263a;border-radius:8px;padding:10px 14px;min-width:140px;">
+      <div style="font-size:10px;color:#8b90b5;margin-bottom:3px;">VISUAL</div>
+      <div style="font-size:12px;color:#e8eaf6;">Split-screen energy: left side shows a parent and child (age ~7) laughing as they share a piano bench following the app; right side shows the child performing the song at a family dinner to applause.</div>
+    </div>
+    <div style="background:#22263a;border-radius:8px;padding:10px 14px;">
+      <div style="font-size:10px;color:#8b90b5;margin-bottom:3px;">CTA</div>
+      <div style="font-size:13px;font-weight:700;color:#6c63ff;">Try It Free — Play Together Tonight</div>
+    </div>
+  </div>
+</div>
+<div style="background:#1a1d27;border:1px solid #2e3250;border-left:4px solid #6c63ff;border-radius:12px;padding:22px 24px;">
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+    <span style="background:rgba(108,99,255,0.1);border:1px solid #6c63ff;border-radius:20px;padding:3px 12px;font-size:11px;color:#6c63ff;font-weight:600;">General Adult Beginners</span>
+    <span style="font-size:11px;color:#8b90b5;">ref: TikTok Top Ad / TikTok</span>
+  </div>
+  <div style="font-size:12px;color:#8b90b5;margin-bottom:12px;padding:10px 14px;background:#22263a;border-radius:8px;"><strong style="color:#e8eaf6;">What makes it work:</strong> The ad uses a single powerful word on a dark canvas to create intrigue and emotional resonance, proving that simplicity and aspiration can outperform information-dense creatives. It positions piano not as a skill to learn but as a lifestyle to step into.</div>
+  <div style="font-size:13px;color:#8b90b5;margin-bottom:14px;line-height:1.7;">Keep the bold, dark-background aesthetic and aspirational energy but immediately prove the promise — transition from an inspiring text hook to a real-time screen recording of a total beginner playing a recognizable pop song within their first session. Change the vague branding into a concrete 'Day 1 vs. Day 7' progress proof using songs like Adele or Harry Styles. Add a modern, sleek UI showcase that makes the app feel premium and effortless, not educational.</div>
+  <div style="background:#22263a;border-radius:8px;padding:14px 16px;margin-bottom:12px;">
+    <div style="font-size:10px;color:#8b90b5;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">HEADLINE</div>
+    <div style="font-size:16px;font-weight:700;color:#e8eaf6;">Play Your First Real Song Today. No Experience Needed.</div>
+  </div>
+  <div style="background:#22263a;border-radius:8px;padding:12px 16px;margin-bottom:10px;">
+    <div style="font-size:10px;color:#8b90b5;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">HOOK / OPENING</div>
+    <div style="font-size:13px;color:#e8eaf6;font-style:italic;">"3 days ago, I'd never touched a piano. Watch this."</div>
+  </div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;">
+    <div style="flex:1;background:#22263a;border-radius:8px;padding:10px 14px;min-width:140px;">
+      <div style="font-size:10px;color:#8b90b5;margin-bottom:3px;">VISUAL</div>
+      <div style="font-size:12px;color:#e8eaf6;">Cinematic dark background with bold text dissolves into a top-down shot of hands on a keyboard following glowing notes in the app, seamlessly playing 'Someone Like You' — modern, sleek, fast-paced editing.</div>
+    </div>
+    <div style="background:#22263a;border-radius:8px;padding:10px 14px;">
+      <div style="font-size:10px;color:#8b90b5;margin-bottom:3px;">CTA</div>
+      <div style="font-size:13px;font-weight:700;color:#6c63ff;">Download Free — Play in Minutes</div>
+    </div>
+  </div>
+</div>
+<div style="background:#1a1d27;border:1px solid #2e3250;border-left:4px solid #ff6584;border-radius:12px;padding:22px 24px;">
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
+    <span style="background:rgba(255,101,132,0.1);border:1px solid #ff6584;border-radius:20px;padding:3px 12px;font-size:11px;color:#ff6584;font-weight:600;">✨ Original Idea</span>
+    
+  </div>
+  
+  <div style="font-size:13px;color:#8b90b5;margin-bottom:14px;line-height:1.7;">Create a 'Sound On' curiosity-gap format where the ad opens with a black screen and a beautiful piano melody playing — the text reads 'This person started learning 30 days ago.' The screen then reveals an ordinary, relatable adult (not a prodigy, not a performer) sitting in their everyday apartment, finishing the piece, and looking up at the camera with genuine surprise and pride. The final card shows their Simply Piano journey timeline: Day 1 (single notes), Day 7 (first song), Day 30 (the piece we just heard). This format is unique because no competitor is showing a verifiable, relatable transformation timeline — they either sell aspiration without proof or show product UI without emotion. This bridges both.</div>
+  <div style="background:#22263a;border-radius:8px;padding:14px 16px;margin-bottom:12px;">
+    <div style="font-size:10px;color:#8b90b5;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">HEADLINE</div>
+    <div style="font-size:16px;font-weight:700;color:#e8eaf6;">30 Days Ago, They Couldn't Play a Single Note.</div>
+  </div>
+  <div style="background:#22263a;border-radius:8px;padding:12px 16px;margin-bottom:10px;">
+    <div style="font-size:10px;color:#8b90b5;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">HOOK / OPENING</div>
+    <div style="font-size:13px;color:#e8eaf6;font-style:italic;">"[Black screen, gorgeous piano music playing] 'This person started learning piano 30 days ago.'"</div>
+  </div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;">
+    <div style="flex:1;background:#22263a;border-radius:8px;padding:10px 14px;min-width:140px;">
+      <div style="font-size:10px;color:#8b90b5;margin-bottom:3px;">VISUAL</div>
+      <div style="font-size:12px;color:#e8eaf6;">Opens on a black screen with a beautiful piano piece playing (sound-on optimized); reveals a real-looking person in a normal apartment finishing the song, then shows a 3-step visual timeline of their 30-day Simply Piano journey.</div>
+    </div>
+    <div style="background:#22263a;border-radius:8px;padding:10px 14px;">
+      <div style="font-size:10px;color:#8b90b5;margin-bottom:3px;">CTA</div>
+      <div style="font-size:13px;font-weight:700;color:#6c63ff;">See What You'll Play in 30 Days — Start Free</div>
+    </div>
+  </div>
+</div></div>
+  </div>
+
+  <!-- TRENDS -->
   <div id="trends">
     <div class="section-header">
-      <h2>📈 Platform Trends This Week</h2>
-      <span class="section-tag">What's shifting across Meta, TikTok & YouTube</span>
+      <h2 style="font-size:18px;font-weight:600;">📈 Platform Trends</h2>
+      <span style="background:#22263a;border:1px solid #2e3250;border-radius:20px;padding:2px 10px;font-size:11px;color:#8b90b5;">What's shifting this week</span>
     </div>
-    <div class="trend-grid">
-
-      <div class="trend-card">
-        <div class="trend-icon">🤖</div>
-        <div class="trend-title">Meta Andromeda: Creative = Targeting</div>
-        <div class="trend-desc">Meta's new algorithm uses ad creative to determine audience — not the other way around. Narrow targeting is obsolete. Diverse creative libraries win. This is the single biggest paid social shift since iOS 14.</div>
-        <div class="trend-signal">⚡ Action: Brief 15+ creative variants per campaign</div>
-      </div>
-
-      <div class="trend-card">
-        <div class="trend-icon">🎵</div>
-        <div class="trend-title">TikTok Piano is Organically Viral</div>
-        <div class="trend-desc">#piano is trending consistently. "Learn this song in 30 days" and prodigy content drive high watch time. Trending songs in Nov–Dec correlate with piano search peaks — high intent window for SP.</div>
-        <div class="trend-signal">⚡ Action: Tap trending songs as ad hooks on TikTok</div>
-      </div>
-
-      <div class="trend-card">
-        <div class="trend-icon">📱</div>
-        <div class="trend-title">50+ Audience is Fully Digital</div>
-        <div class="trend-desc">Adults 50+ now have 90% smartphone ownership (up from 55% in 2016). 71% bought tech in 2025. They are NOT the laggards anymore. AARP data shows travel, learning, and wellness apps growing fastest in this demo.</div>
-        <div class="trend-signal">⚡ Action: Increase 50+ budget allocation — audience is ready</div>
-      </div>
-
-      <div class="trend-card">
-        <div class="trend-icon">🎭</div>
-        <div class="trend-title">Narrative Ads Outperform Product Demos</div>
-        <div class="trend-desc">Duolingo proved it: a story people follow earns more media than a campaign you pay for. App ads that build narrative arcs (day 1 → day 30, before → after, "I almost quit but…") generate far higher completion rates and shares.</div>
-        <div class="trend-signal">⚡ Action: Test a "journey" format — follow one learner over 30 days</div>
-      </div>
-
-      <div class="trend-card">
-        <div class="trend-icon">🎬</div>
-        <div class="trend-title">UGC-Style Outperforms Polished Production</div>
-        <div class="trend-desc">Across Meta and TikTok, raw authentic video (phone shot, natural lighting, real reactions) beats studio production in 2026. The algorithm rewards content that looks native to the feed, not like an ad.</div>
-        <div class="trend-signal">⚡ Action: Brief UGC-style "real user" formats alongside polished ads</div>
-      </div>
-
-      <div class="trend-card">
-        <div class="trend-icon">📊</div>
-        <div class="trend-title">Static Ads Still Drive 60–70% of Meta Conversions</div>
-        <div class="trend-desc">Despite the video trend, static image ads remain the #1 conversion driver on Meta. Don't over-invest in video at the expense of static. A strong static hook + clear CTA still outperforms most video in direct response.</div>
-        <div class="trend-signal">⚡ Action: Always include strong static variants in every test batch</div>
-      </div>
-
-    </div>
+    <div class="trends-grid"></div>
   </div>
 
-  <!-- ── WATCHLIST ── -->
+  <!-- WATCHLIST -->
   <div id="watchlist">
     <div class="section-header">
-      <h2>👁️ Brand Watchlist</h2>
-      <span class="section-tag">Click to open their live ad library</span>
+      <h2 style="font-size:18px;font-weight:600;">👁️ Brand Watchlist</h2>
+      <span style="background:#22263a;border:1px solid #2e3250;border-radius:20px;padding:2px 10px;font-size:11px;color:#8b90b5;">Click to open live ad library</span>
     </div>
-
-    <div style="margin-bottom: 16px;">
-      <div class="section-tag" style="display:inline-block; margin-bottom:10px;">🎯 Direct Competitors</div>
-      <div class="watchlist-grid">
-        <a href="https://www.facebook.com/ads/library/?active_status=active&ad_type=all&country=US&q=flowkey&search_type=keyword_unordered" target="_blank" class="watchlist-card"><div class="wl-icon">🎹</div><div><div class="wl-name">Flowkey</div><div class="wl-cat">Music Learning</div></div></a>
-        <a href="https://www.facebook.com/ads/library/?active_status=active&ad_type=all&country=US&q=yousician&search_type=keyword_unordered" target="_blank" class="watchlist-card"><div class="wl-icon">🎸</div><div><div class="wl-name">Yousician</div><div class="wl-cat">Music Learning</div></div></a>
-        <a href="https://www.facebook.com/ads/library/?active_status=active&ad_type=all&country=US&q=fender+play&search_type=keyword_unordered" target="_blank" class="watchlist-card"><div class="wl-icon">🎵</div><div><div class="wl-name">Fender Play</div><div class="wl-cat">Music Learning</div></div></a>
-        <a href="https://www.facebook.com/ads/library/?active_status=active&ad_type=all&country=US&q=pianote&search_type=keyword_unordered" target="_blank" class="watchlist-card"><div class="wl-icon">🎼</div><div><div class="wl-name">Pianote</div><div class="wl-cat">Music Learning</div></div></a>
-        <a href="https://www.facebook.com/ads/library/?active_status=active&ad_type=all&country=US&q=skoove&search_type=keyword_unordered" target="_blank" class="watchlist-card"><div class="wl-icon">🎶</div><div><div class="wl-name">Skoove</div><div class="wl-cat">Music Learning</div></div></a>
-        <a href="https://www.facebook.com/ads/library/?active_status=active&ad_type=all&country=US&q=playground+sessions&search_type=keyword_unordered" target="_blank" class="watchlist-card"><div class="wl-icon">🎹</div><div><div class="wl-name">Playground Sessions</div><div class="wl-cat">Music Learning</div></div></a>
-      </div>
-    </div>
-
-    <div style="margin-top: 20px; margin-bottom: 16px;">
-      <div class="section-tag" style="display:inline-block; margin-bottom:10px;">📚 EdTech / Habit</div>
-      <div class="watchlist-grid">
-        <a href="https://www.facebook.com/ads/library/?active_status=active&ad_type=all&country=US&q=duolingo&search_type=keyword_unordered" target="_blank" class="watchlist-card"><div class="wl-icon">🦉</div><div><div class="wl-name">Duolingo</div><div class="wl-cat">Language Learning</div></div></a>
-        <a href="https://www.facebook.com/ads/library/?active_status=active&ad_type=all&country=US&q=masterclass&search_type=keyword_unordered" target="_blank" class="watchlist-card"><div class="wl-icon">🎓</div><div><div class="wl-name">MasterClass</div><div class="wl-cat">EdTech</div></div></a>
-        <a href="https://www.facebook.com/ads/library/?active_status=active&ad_type=all&country=US&q=brilliant+app&search_type=keyword_unordered" target="_blank" class="watchlist-card"><div class="wl-icon">💡</div><div><div class="wl-name">Brilliant</div><div class="wl-cat">EdTech</div></div></a>
-        <a href="https://www.facebook.com/ads/library/?active_status=active&ad_type=all&country=US&q=headspace&search_type=keyword_unordered" target="_blank" class="watchlist-card"><div class="wl-icon">🧘</div><div><div class="wl-name">Headspace</div><div class="wl-cat">Wellness</div></div></a>
-        <a href="https://www.facebook.com/ads/library/?active_status=active&ad_type=all&country=US&q=rosetta+stone&search_type=keyword_unordered" target="_blank" class="watchlist-card"><div class="wl-icon">🌍</div><div><div class="wl-name">Rosetta Stone</div><div class="wl-cat">Language / 50+</div></div></a>
-        <a href="https://www.facebook.com/ads/library/?active_status=active&ad_type=all&country=US&q=noom&search_type=keyword_unordered" target="_blank" class="watchlist-card"><div class="wl-icon">🏃</div><div><div class="wl-name">Noom</div><div class="wl-cat">50+ Audience</div></div></a>
-      </div>
-    </div>
-
-    <div style="margin-top: 20px;">
-      <div class="section-tag" style="display:inline-block; margin-bottom:10px;">👨‍👩‍👧 Kids & Family</div>
-      <div class="watchlist-grid">
-        <a href="https://www.facebook.com/ads/library/?active_status=active&ad_type=all&country=US&q=abcmouse&search_type=keyword_unordered" target="_blank" class="watchlist-card"><div class="wl-icon">🐭</div><div><div class="wl-name">ABCmouse</div><div class="wl-cat">Kids Education</div></div></a>
-        <a href="https://www.facebook.com/ads/library/?active_status=active&ad_type=all&country=US&q=khan+academy+kids&search_type=keyword_unordered" target="_blank" class="watchlist-card"><div class="wl-icon">🦊</div><div><div class="wl-name">Khan Academy Kids</div><div class="wl-cat">Kids Education</div></div></a>
-        <a href="https://www.facebook.com/ads/library/?active_status=active&ad_type=all&country=US&q=splashlearn&search_type=keyword_unordered" target="_blank" class="watchlist-card"><div class="wl-icon">💧</div><div><div class="wl-name">SplashLearn</div><div class="wl-cat">Kids Education</div></div></a>
-        <a href="https://www.facebook.com/ads/library/?active_status=active&ad_type=all&country=US&q=lingokids&search_type=keyword_unordered" target="_blank" class="watchlist-card"><div class="wl-icon">🗣️</div><div><div class="wl-name">Lingokids</div><div class="wl-cat">Kids Education</div></div></a>
-      </div>
-    </div>
+    <div style="margin-bottom:20px;"><div style="font-size:11px;color:#8b90b5;background:#22263a;border-radius:20px;padding:3px 12px;display:inline-block;margin-bottom:12px;">🎯 Direct Competitors</div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;"><a href="https://www.facebook.com/ads/library/?active_status=active&ad_type=all&country=US&q=flowkey&search_type=keyword_unordered" target="_blank" style="background:#1a1d27;border:1px solid #2e3250;border-radius:10px;padding:12px 14px;display:flex;align-items:center;gap:10px;text-decoration:none;color:#e8eaf6;transition:border-color 0.2s;" onmouseover="this.style.borderColor='#6c63ff'" onmouseout="this.style.borderColor='#2e3250'"><span style="font-size:14px;">🔗</span><div><div style="font-size:13px;font-weight:600;">Flowkey</div><div style="font-size:10px;color:#8b90b5;">Music Learning</div></div></a><a href="https://www.facebook.com/ads/library/?active_status=active&ad_type=all&country=US&q=yousician&search_type=keyword_unordered" target="_blank" style="background:#1a1d27;border:1px solid #2e3250;border-radius:10px;padding:12px 14px;display:flex;align-items:center;gap:10px;text-decoration:none;color:#e8eaf6;transition:border-color 0.2s;" onmouseover="this.style.borderColor='#6c63ff'" onmouseout="this.style.borderColor='#2e3250'"><span style="font-size:14px;">🔗</span><div><div style="font-size:13px;font-weight:600;">Yousician</div><div style="font-size:10px;color:#8b90b5;">Music Learning</div></div></a><a href="https://www.facebook.com/ads/library/?active_status=active&ad_type=all&country=US&q=fender+play&search_type=keyword_unordered" target="_blank" style="background:#1a1d27;border:1px solid #2e3250;border-radius:10px;padding:12px 14px;display:flex;align-items:center;gap:10px;text-decoration:none;color:#e8eaf6;transition:border-color 0.2s;" onmouseover="this.style.borderColor='#6c63ff'" onmouseout="this.style.borderColor='#2e3250'"><span style="font-size:14px;">🔗</span><div><div style="font-size:13px;font-weight:600;">Fender Play</div><div style="font-size:10px;color:#8b90b5;">Music Learning</div></div></a><a href="https://www.facebook.com/ads/library/?active_status=active&ad_type=all&country=US&q=pianote&search_type=keyword_unordered" target="_blank" style="background:#1a1d27;border:1px solid #2e3250;border-radius:10px;padding:12px 14px;display:flex;align-items:center;gap:10px;text-decoration:none;color:#e8eaf6;transition:border-color 0.2s;" onmouseover="this.style.borderColor='#6c63ff'" onmouseout="this.style.borderColor='#2e3250'"><span style="font-size:14px;">🔗</span><div><div style="font-size:13px;font-weight:600;">Pianote</div><div style="font-size:10px;color:#8b90b5;">Music Learning</div></div></a><a href="https://www.facebook.com/ads/library/?active_status=active&ad_type=all&country=US&q=skoove&search_type=keyword_unordered" target="_blank" style="background:#1a1d27;border:1px solid #2e3250;border-radius:10px;padding:12px 14px;display:flex;align-items:center;gap:10px;text-decoration:none;color:#e8eaf6;transition:border-color 0.2s;" onmouseover="this.style.borderColor='#6c63ff'" onmouseout="this.style.borderColor='#2e3250'"><span style="font-size:14px;">🔗</span><div><div style="font-size:13px;font-weight:600;">Skoove</div><div style="font-size:10px;color:#8b90b5;">Music Learning</div></div></a><a href="https://www.facebook.com/ads/library/?active_status=active&ad_type=all&country=US&q=playground+sessions&search_type=keyword_unordered" target="_blank" style="background:#1a1d27;border:1px solid #2e3250;border-radius:10px;padding:12px 14px;display:flex;align-items:center;gap:10px;text-decoration:none;color:#e8eaf6;transition:border-color 0.2s;" onmouseover="this.style.borderColor='#6c63ff'" onmouseout="this.style.borderColor='#2e3250'"><span style="font-size:14px;">🔗</span><div><div style="font-size:13px;font-weight:600;">Playground Sessions</div><div style="font-size:10px;color:#8b90b5;">Music Learning</div></div></a></div></div><div style="margin-bottom:20px;"><div style="font-size:11px;color:#8b90b5;background:#22263a;border-radius:20px;padding:3px 12px;display:inline-block;margin-bottom:12px;">📚 EdTech / Habit</div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;"><a href="https://www.facebook.com/ads/library/?active_status=active&ad_type=all&country=US&q=duolingo&search_type=keyword_unordered" target="_blank" style="background:#1a1d27;border:1px solid #2e3250;border-radius:10px;padding:12px 14px;display:flex;align-items:center;gap:10px;text-decoration:none;color:#e8eaf6;transition:border-color 0.2s;" onmouseover="this.style.borderColor='#6c63ff'" onmouseout="this.style.borderColor='#2e3250'"><span style="font-size:14px;">🔗</span><div><div style="font-size:13px;font-weight:600;">Duolingo</div><div style="font-size:10px;color:#8b90b5;">EdTech</div></div></a><a href="https://www.facebook.com/ads/library/?active_status=active&ad_type=all&country=US&q=masterclass&search_type=keyword_unordered" target="_blank" style="background:#1a1d27;border:1px solid #2e3250;border-radius:10px;padding:12px 14px;display:flex;align-items:center;gap:10px;text-decoration:none;color:#e8eaf6;transition:border-color 0.2s;" onmouseover="this.style.borderColor='#6c63ff'" onmouseout="this.style.borderColor='#2e3250'"><span style="font-size:14px;">🔗</span><div><div style="font-size:13px;font-weight:600;">Masterclass</div><div style="font-size:10px;color:#8b90b5;">EdTech</div></div></a><a href="https://www.facebook.com/ads/library/?active_status=active&ad_type=all&country=US&q=brilliant&search_type=keyword_unordered" target="_blank" style="background:#1a1d27;border:1px solid #2e3250;border-radius:10px;padding:12px 14px;display:flex;align-items:center;gap:10px;text-decoration:none;color:#e8eaf6;transition:border-color 0.2s;" onmouseover="this.style.borderColor='#6c63ff'" onmouseout="this.style.borderColor='#2e3250'"><span style="font-size:14px;">🔗</span><div><div style="font-size:13px;font-weight:600;">Brilliant</div><div style="font-size:10px;color:#8b90b5;">EdTech</div></div></a><a href="https://www.facebook.com/ads/library/?active_status=active&ad_type=all&country=US&q=headspace&search_type=keyword_unordered" target="_blank" style="background:#1a1d27;border:1px solid #2e3250;border-radius:10px;padding:12px 14px;display:flex;align-items:center;gap:10px;text-decoration:none;color:#e8eaf6;transition:border-color 0.2s;" onmouseover="this.style.borderColor='#6c63ff'" onmouseout="this.style.borderColor='#2e3250'"><span style="font-size:14px;">🔗</span><div><div style="font-size:13px;font-weight:600;">Headspace</div><div style="font-size:10px;color:#8b90b5;">EdTech</div></div></a><a href="https://www.facebook.com/ads/library/?active_status=active&ad_type=all&country=US&q=rosetta+stone&search_type=keyword_unordered" target="_blank" style="background:#1a1d27;border:1px solid #2e3250;border-radius:10px;padding:12px 14px;display:flex;align-items:center;gap:10px;text-decoration:none;color:#e8eaf6;transition:border-color 0.2s;" onmouseover="this.style.borderColor='#6c63ff'" onmouseout="this.style.borderColor='#2e3250'"><span style="font-size:14px;">🔗</span><div><div style="font-size:13px;font-weight:600;">Rosetta Stone</div><div style="font-size:10px;color:#8b90b5;">EdTech</div></div></a><a href="https://www.facebook.com/ads/library/?active_status=active&ad_type=all&country=US&q=noom&search_type=keyword_unordered" target="_blank" style="background:#1a1d27;border:1px solid #2e3250;border-radius:10px;padding:12px 14px;display:flex;align-items:center;gap:10px;text-decoration:none;color:#e8eaf6;transition:border-color 0.2s;" onmouseover="this.style.borderColor='#6c63ff'" onmouseout="this.style.borderColor='#2e3250'"><span style="font-size:14px;">🔗</span><div><div style="font-size:13px;font-weight:600;">Noom</div><div style="font-size:10px;color:#8b90b5;">EdTech</div></div></a><a href="https://www.facebook.com/ads/library/?active_status=active&ad_type=all&country=US&q=coursera&search_type=keyword_unordered" target="_blank" style="background:#1a1d27;border:1px solid #2e3250;border-radius:10px;padding:12px 14px;display:flex;align-items:center;gap:10px;text-decoration:none;color:#e8eaf6;transition:border-color 0.2s;" onmouseover="this.style.borderColor='#6c63ff'" onmouseout="this.style.borderColor='#2e3250'"><span style="font-size:14px;">🔗</span><div><div style="font-size:13px;font-weight:600;">Coursera</div><div style="font-size:10px;color:#8b90b5;">EdTech</div></div></a></div></div><div style="margin-bottom:20px;"><div style="font-size:11px;color:#8b90b5;background:#22263a;border-radius:20px;padding:3px 12px;display:inline-block;margin-bottom:12px;">👨‍👩‍👧 Kids & Family</div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;"><a href="https://www.facebook.com/ads/library/?active_status=active&ad_type=all&country=US&q=abcmouse&search_type=keyword_unordered" target="_blank" style="background:#1a1d27;border:1px solid #2e3250;border-radius:10px;padding:12px 14px;display:flex;align-items:center;gap:10px;text-decoration:none;color:#e8eaf6;transition:border-color 0.2s;" onmouseover="this.style.borderColor='#6c63ff'" onmouseout="this.style.borderColor='#2e3250'"><span style="font-size:14px;">🔗</span><div><div style="font-size:13px;font-weight:600;">Abcmouse</div><div style="font-size:10px;color:#8b90b5;">Kids Education</div></div></a><a href="https://www.facebook.com/ads/library/?active_status=active&ad_type=all&country=US&q=khan+academy+kids&search_type=keyword_unordered" target="_blank" style="background:#1a1d27;border:1px solid #2e3250;border-radius:10px;padding:12px 14px;display:flex;align-items:center;gap:10px;text-decoration:none;color:#e8eaf6;transition:border-color 0.2s;" onmouseover="this.style.borderColor='#6c63ff'" onmouseout="this.style.borderColor='#2e3250'"><span style="font-size:14px;">🔗</span><div><div style="font-size:13px;font-weight:600;">Khan Academy Kids</div><div style="font-size:10px;color:#8b90b5;">Kids Education</div></div></a><a href="https://www.facebook.com/ads/library/?active_status=active&ad_type=all&country=US&q=splashlearn&search_type=keyword_unordered" target="_blank" style="background:#1a1d27;border:1px solid #2e3250;border-radius:10px;padding:12px 14px;display:flex;align-items:center;gap:10px;text-decoration:none;color:#e8eaf6;transition:border-color 0.2s;" onmouseover="this.style.borderColor='#6c63ff'" onmouseout="this.style.borderColor='#2e3250'"><span style="font-size:14px;">🔗</span><div><div style="font-size:13px;font-weight:600;">Splashlearn</div><div style="font-size:10px;color:#8b90b5;">Kids Education</div></div></a><a href="https://www.facebook.com/ads/library/?active_status=active&ad_type=all&country=US&q=lingokids&search_type=keyword_unordered" target="_blank" style="background:#1a1d27;border:1px solid #2e3250;border-radius:10px;padding:12px 14px;display:flex;align-items:center;gap:10px;text-decoration:none;color:#e8eaf6;transition:border-color 0.2s;" onmouseover="this.style.borderColor='#6c63ff'" onmouseout="this.style.borderColor='#2e3250'"><span style="font-size:14px;">🔗</span><div><div style="font-size:13px;font-weight:600;">Lingokids</div><div style="font-size:10px;color:#8b90b5;">Kids Education</div></div></a></div></div>
   </div>
 
+  
+
 </div>
 
-<div class="footer">
-  Simply Piano Creative Brief · Generated April 6, 2026 · <a href="https://simplyjonatan.github.io/creative-brief" style="color:var(--accent); text-decoration:none;">simplyjonatan.github.io/creative-brief</a>
+<div style="margin-top:60px;border-top:1px solid #2e3250;padding:24px 32px;text-align:center;font-size:12px;color:#8b90b5;">
+  Simply Piano Creative Brief · Generated Tuesday, April 7, 2026 at 08:00 IL ·
+  <a href="https://simplyjonatan.github.io/creative-brief" style="color:#6c63ff;text-decoration:none;">https://simplyjonatan.github.io/creative-brief</a>
 </div>
-
-<script>
-  function filterCards(cat, el) {
-    document.querySelectorAll('.filter-bar .pill').forEach(p => p.classList.remove('active'));
-    el.classList.add('active');
-    document.querySelectorAll('.ad-card').forEach(card => {
-      card.style.display = (cat === 'all' || card.dataset.cat === cat) ? '' : 'none';
-    });
-  }
-</script>
 
 </body>
 </html>

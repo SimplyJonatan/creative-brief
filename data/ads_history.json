@@ -1,4 +1,55 @@
 {
-  "ads": {},
-  "first_seen": {}
+  "ads": {
+    "tiktok_top_0_1775566131": {
+      "brand": "TikTok Top Ad",
+      "platform": "TikTok",
+      "last_seen": "2026-04-07",
+      "days_running": 0
+    },
+    "google_flowkey_fallback": {
+      "brand": "Flowkey",
+      "platform": "Google/YouTube",
+      "last_seen": "2026-04-07",
+      "days_running": 0
+    },
+    "google_yousician_fallback": {
+      "brand": "Yousician",
+      "platform": "Google/YouTube",
+      "last_seen": "2026-04-07",
+      "days_running": 0
+    },
+    "google_fender_play_fallback": {
+      "brand": "Fender Play",
+      "platform": "Google/YouTube",
+      "last_seen": "2026-04-07",
+      "days_running": 0
+    },
+    "google_pianote_fallback": {
+      "brand": "Pianote",
+      "platform": "Google/YouTube",
+      "last_seen": "2026-04-07",
+      "days_running": 0
+    },
+    "google_duolingo_fallback": {
+      "brand": "Duolingo",
+      "platform": "Google/YouTube",
+      "last_seen": "2026-04-07",
+      "days_running": 0
+    },
+    "google_masterclass_fallback": {
+      "brand": "Masterclass",
+      "platform": "Google/YouTube",
+      "last_seen": "2026-04-07",
+      "days_running": 0
+    }
+  },
+  "first_seen": {
+    "tiktok_top_0_1775566131": "2026-04-07",
+    "google_flowkey_fallback": "2026-04-07",
+    "google_yousician_fallback": "2026-04-07",
+    "google_fender_play_fallback": "2026-04-07",
+    "google_pianote_fallback": "2026-04-07",
+    "google_duolingo_fallback": "2026-04-07",
+    "google_masterclass_fallback": "2026-04-07"
+  }
 }
