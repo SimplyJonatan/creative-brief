@@ -21,15 +21,15 @@ def scrape_brand(page: Page, brand: str, assets_dir: Path, max_ads: int = 5) -> 
 
     print(f"[Google] Scanning: {brand}")
     try:
-        page.goto(url, wait_until="domcontentloaded", timeout=25000)
-        page.wait_for_timeout(4000)
-
-        # Intercept video URLs
+        # Intercept video URLs before navigation
         video_urls = []
         page.on("response", lambda r: video_urls.append(r.url) if ".mp4" in r.url else None)
 
+        page.goto(url, wait_until="domcontentloaded", timeout=30000)
+        page.wait_for_timeout(5000)
+
         # Handle consent page if shown
-        for consent_sel in ["[aria-label='Accept all']", "button:has-text('Accept')", "[id*='accept']"]:
+        for consent_sel in ["[aria-label='Accept all']", "button:has-text('Accept all')", "button:has-text('Accept')", "[id*='accept']"]:
             try:
                 btn = page.query_selector(consent_sel)
                 if btn:
@@ -39,22 +39,37 @@ def scrape_brand(page: Page, brand: str, assets_dir: Path, max_ads: int = 5) -> 
             except Exception:
                 pass
 
+        # Scroll down to trigger lazy loading
+        page.evaluate("window.scrollTo(0, 400)")
+        page.wait_for_timeout(3000)
+        page.evaluate("window.scrollTo(0, 800)")
         page.wait_for_timeout(2000)
 
-        # Find ad creative cards
+        # Find ad creative cards — Google Transparency uses Angular web components
         card_selectors = [
             "creative-preview",
-            "[class*='creative']",
-            "[class*='ad-card']",
+            "ad-creative-shared-video-thumbnail",
+            "[class*='advertiser-result-ad']",
             "mat-card",
-            "[role='listitem']"
+            "[class*='creative-wrapper']",
+            "[class*='result-item']",
+            "[role='listitem']",
+            "[class*='ad-unit']",
         ]
 
         cards = []
         for sel in card_selectors:
-            cards = page.query_selector_all(sel)
-            if len(cards) > 2:
+            found = page.query_selector_all(sel)
+            if len(found) > 1:
+                cards = found
+                print(f"  [Google] Selector '{sel}' found {len(found)} cards for {brand}")
                 break
+
+        if not cards:
+            # Last resort: grab any visible images that look like ad thumbnails
+            cards = page.query_selector_all("img[src*='googleusercontent'], img[src*='gstatic']")
+            if cards:
+                print(f"  [Google] Found {len(cards)} thumbnail images for {brand}")
 
         print(f"  [Google] {len(cards)} cards found for {brand}")
 
