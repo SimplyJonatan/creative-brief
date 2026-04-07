@@ -133,7 +133,7 @@ def creative_brief_card(brief: dict) -> str:
 </div>'''
 
 
-def generate_brief(analysis_results: dict, leaderboard: list, config: dict, output_path: Path, repo_root: Path, trigger_token: str = ""):
+def generate_brief(analysis_results: dict, leaderboard: list, config: dict, output_path: Path, repo_root: Path, trigger_token: str = ""):  # trigger_token kept for backwards compat, no longer embedded
     ads = analysis_results.get("ads", [])
     gap = analysis_results.get("gap_analysis", {})
     briefs = analysis_results.get("creative_briefs", [])
@@ -263,7 +263,12 @@ def generate_brief(analysis_results: dict, leaderboard: list, config: dict, outp
     <div style="font-weight:700;font-size:16px;margin-bottom:4px;">Refresh Brief</div>
     <div style="font-size:13px;color:#8b90b5;margin-bottom:4px;">Enter your PIN to start a new scan.</div>
     <div style="font-size:11px;color:#8b90b5;">Takes ~10 min. Page auto-refreshes when ready.</div>
-    <input id="pin-input" type="password" maxlength="4" placeholder="····" autocomplete="off"/>
+    <input id="pin-input" type="password" maxlength="4" placeholder="PIN ····" autocomplete="off"/>
+    <div id="token-row" style="display:none;">
+      <div style="font-size:11px;color:#8b90b5;margin-bottom:6px;text-align:left;">GitHub Token (saved in your browser — only needed once)</div>
+      <input id="token-input" type="password" placeholder="github_pat_..." autocomplete="off" style="background:#0f1117;border:1px solid #2e3250;border-radius:8px;color:#e8eaf6;font-size:13px;padding:10px;width:100%;outline:none;margin-bottom:8px;"/>
+    </div>
+    <div id="token-saved" style="display:none;font-size:11px;color:#3ecf8e;margin-bottom:8px;">✅ Token saved · <button onclick="forgetToken()" style="background:none;border:none;color:#8b90b5;font-size:11px;cursor:pointer;text-decoration:underline;">use a different one</button></div>
     <div id="pin-error"></div>
     <button id="pin-submit" onclick="submitPin()">Run Scan</button>
     <br/><button id="pin-cancel" onclick="closeModal()">Cancel</button>
@@ -281,16 +286,26 @@ def generate_brief(analysis_results: dict, leaderboard: list, config: dict, outp
   const REPO_OWNER    = 'SimplyJonatan';
   const REPO_NAME     = 'creative-brief';
   const WORKFLOW_FILE = 'daily-brief.yml';
-  const GH_TOKEN      = '{trigger_token}';
+  const TOKEN_KEY     = 'cb_gh_token';
 
   function openModal() {{
-    document.getElementById('refresh-modal').classList.add('open');
+    const saved = localStorage.getItem(TOKEN_KEY) || '';
     document.getElementById('pin-input').value = '';
+    document.getElementById('token-input').value = saved ? '••••••••••••••••' : '';
+    document.getElementById('token-row').style.display = saved ? 'none' : 'block';
+    document.getElementById('token-saved').style.display = saved ? 'block' : 'none';
     document.getElementById('pin-error').textContent = '';
+    document.getElementById('refresh-modal').classList.add('open');
     setTimeout(() => document.getElementById('pin-input').focus(), 100);
   }}
   function closeModal() {{
     document.getElementById('refresh-modal').classList.remove('open');
+  }}
+  function forgetToken() {{
+    localStorage.removeItem(TOKEN_KEY);
+    document.getElementById('token-row').style.display = 'block';
+    document.getElementById('token-saved').style.display = 'none';
+    document.getElementById('token-input').value = '';
   }}
   document.getElementById('pin-input').addEventListener('keydown', e => {{
     if (e.key === 'Enter') submitPin();
@@ -309,11 +324,19 @@ def generate_brief(analysis_results: dict, leaderboard: list, config: dict, outp
       document.getElementById('pin-input').value = '';
       return;
     }}
-    closeModal();
-    if (!GH_TOKEN || GH_TOKEN === '') {{
-      showToast('⚠️', 'No trigger token configured. Add TRIGGER_TOKEN secret in GitHub.', 8000);
+    // Get token — from input or localStorage
+    let token = localStorage.getItem(TOKEN_KEY) || '';
+    const inputVal = document.getElementById('token-input').value.trim();
+    if (inputVal && !inputVal.startsWith('•')) {{
+      token = inputVal;
+      localStorage.setItem(TOKEN_KEY, token);
+    }}
+    if (!token) {{
+      document.getElementById('pin-error').textContent = 'Please enter your GitHub token.';
+      document.getElementById('token-row').style.display = 'block';
       return;
     }}
+    closeModal();
     const btn = document.getElementById('refresh-btn');
     btn.disabled = true;
     btn.innerHTML = '⏳ Starting scan…';
@@ -321,7 +344,7 @@ def generate_brief(analysis_results: dict, leaderboard: list, config: dict, outp
     fetch(`https://api.github.com/repos/${{REPO_OWNER}}/${{REPO_NAME}}/actions/workflows/${{WORKFLOW_FILE}}/dispatches`, {{
       method: 'POST',
       headers: {{
-        'Authorization': `token ${{GH_TOKEN}}`,
+        'Authorization': `token ${{token}}`,
         'Accept': 'application/vnd.github.v3+json',
         'Content-Type': 'application/json'
       }},
@@ -331,10 +354,16 @@ def generate_brief(analysis_results: dict, leaderboard: list, config: dict, outp
       if (r.status === 204) {{
         showToast('✅', 'Scan running! Come back in ~10 min and refresh the page.', 0);
         btn.innerHTML = '✅ Scan running…';
-        // Auto-reload the page after 12 minutes
         setTimeout(() => location.reload(), 12 * 60 * 1000);
       }} else {{
-        r.text().then(t => showToast('❌', `Error ${{r.status}}: ${{t}}`, 8000));
+        r.text().then(t => {{
+          if (r.status === 401) {{
+            localStorage.removeItem(TOKEN_KEY);
+            showToast('❌', 'Token rejected — please refresh and enter a valid token.', 8000);
+          }} else {{
+            showToast('❌', `Error ${{r.status}}: ${{t}}`, 8000);
+          }}
+        }});
         btn.disabled = false;
         btn.innerHTML = '🔄 Refresh Brief';
       }}
@@ -345,7 +374,6 @@ def generate_brief(analysis_results: dict, leaderboard: list, config: dict, outp
       btn.innerHTML = '🔄 Refresh Brief';
     }});
   }}
-  // Close modal on backdrop click
   document.getElementById('refresh-modal').addEventListener('click', e => {{
     if (e.target === document.getElementById('refresh-modal')) closeModal();
   }});
