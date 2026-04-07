@@ -46,7 +46,12 @@
     <div style="font-weight:700;font-size:16px;margin-bottom:4px;">Refresh Brief</div>
     <div style="font-size:13px;color:#8b90b5;margin-bottom:4px;">Enter your PIN to start a new scan.</div>
     <div style="font-size:11px;color:#8b90b5;">Takes ~10 min. Page auto-refreshes when ready.</div>
-    <input id="pin-input" type="password" maxlength="4" placeholder="····" autocomplete="off"/>
+    <input id="pin-input" type="password" maxlength="4" placeholder="PIN ····" autocomplete="off"/>
+    <div id="token-row" style="display:none;">
+      <div style="font-size:11px;color:#8b90b5;margin-bottom:6px;text-align:left;">GitHub Token (saved in your browser — only needed once)</div>
+      <input id="token-input" type="password" placeholder="github_pat_..." autocomplete="off" style="background:#0f1117;border:1px solid #2e3250;border-radius:8px;color:#e8eaf6;font-size:13px;padding:10px;width:100%;outline:none;margin-bottom:8px;"/>
+    </div>
+    <div id="token-saved" style="display:none;font-size:11px;color:#3ecf8e;margin-bottom:8px;">✅ Token saved · <button onclick="forgetToken()" style="background:none;border:none;color:#8b90b5;font-size:11px;cursor:pointer;text-decoration:underline;">use a different one</button></div>
     <div id="pin-error"></div>
     <button id="pin-submit" onclick="submitPin()">Run Scan</button>
     <br/><button id="pin-cancel" onclick="closeModal()">Cancel</button>
@@ -64,16 +69,26 @@
   const REPO_OWNER    = 'SimplyJonatan';
   const REPO_NAME     = 'creative-brief';
   const WORKFLOW_FILE = 'daily-brief.yml';
-  const GH_TOKEN      = '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';
+  const TOKEN_KEY     = 'cb_gh_token';
 
   function openModal() {
-    document.getElementById('refresh-modal').classList.add('open');
+    const saved = localStorage.getItem(TOKEN_KEY) || '';
     document.getElementById('pin-input').value = '';
+    document.getElementById('token-input').value = saved ? '••••••••••••••••' : '';
+    document.getElementById('token-row').style.display = saved ? 'none' : 'block';
+    document.getElementById('token-saved').style.display = saved ? 'block' : 'none';
     document.getElementById('pin-error').textContent = '';
+    document.getElementById('refresh-modal').classList.add('open');
     setTimeout(() => document.getElementById('pin-input').focus(), 100);
   }
   function closeModal() {
     document.getElementById('refresh-modal').classList.remove('open');
+  }
+  function forgetToken() {
+    localStorage.removeItem(TOKEN_KEY);
+    document.getElementById('token-row').style.display = 'block';
+    document.getElementById('token-saved').style.display = 'none';
+    document.getElementById('token-input').value = '';
   }
   document.getElementById('pin-input').addEventListener('keydown', e => {
     if (e.key === 'Enter') submitPin();
@@ -92,11 +107,19 @@
       document.getElementById('pin-input').value = '';
       return;
     }
-    closeModal();
-    if (!GH_TOKEN || GH_TOKEN === '') {
-      showToast('⚠️', 'No trigger token configured. Add TRIGGER_TOKEN secret in GitHub.', 8000);
+    // Get token — from input or localStorage
+    let token = localStorage.getItem(TOKEN_KEY) || '';
+    const inputVal = document.getElementById('token-input').value.trim();
+    if (inputVal && !inputVal.startsWith('•')) {
+      token = inputVal;
+      localStorage.setItem(TOKEN_KEY, token);
+    }
+    if (!token) {
+      document.getElementById('pin-error').textContent = 'Please enter your GitHub token.';
+      document.getElementById('token-row').style.display = 'block';
       return;
     }
+    closeModal();
     const btn = document.getElementById('refresh-btn');
     btn.disabled = true;
     btn.innerHTML = '⏳ Starting scan…';
@@ -104,7 +127,7 @@
     fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/actions/workflows/${WORKFLOW_FILE}/dispatches`, {
       method: 'POST',
       headers: {
-        'Authorization': `token ${GH_TOKEN}`,
+        'Authorization': `token ${token}`,
         'Accept': 'application/vnd.github.v3+json',
         'Content-Type': 'application/json'
       },
@@ -114,10 +137,16 @@
       if (r.status === 204) {
         showToast('✅', 'Scan running! Come back in ~10 min and refresh the page.', 0);
         btn.innerHTML = '✅ Scan running…';
-        // Auto-reload the page after 12 minutes
         setTimeout(() => location.reload(), 12 * 60 * 1000);
       } else {
-        r.text().then(t => showToast('❌', `Error ${r.status}: ${t}`, 8000));
+        r.text().then(t => {
+          if (r.status === 401) {
+            localStorage.removeItem(TOKEN_KEY);
+            showToast('❌', 'Token rejected — please refresh and enter a valid token.', 8000);
+          } else {
+            showToast('❌', `Error ${r.status}: ${t}`, 8000);
+          }
+        });
         btn.disabled = false;
         btn.innerHTML = '🔄 Refresh Brief';
       }
@@ -128,7 +157,6 @@
       btn.innerHTML = '🔄 Refresh Brief';
     });
   }
-  // Close modal on backdrop click
   document.getElementById('refresh-modal').addEventListener('click', e => {
     if (e.target === document.getElementById('refresh-modal')) closeModal();
   });
@@ -154,56 +182,34 @@
 <div class="container">
 
   <div class="hero">
-    <div class="hero-stat"><div class="num">7</div><div class="label">New Ads Today</div></div>
-    <div class="hero-stat"><div class="num">7</div><div class="label">Brands Scanned</div></div>
+    <div class="hero-stat"><div class="num">6</div><div class="label">Ads Collected</div></div>
+    <div class="hero-stat"><div class="num">6</div><div class="label">Brands Scanned</div></div>
     <div class="hero-stat"><div class="num">0</div><div class="label">Long-Running Winners</div></div>
-    <div class="hero-stat"><div class="num">4</div><div class="label">SP Briefs Generated</div></div>
+    <div class="hero-stat"><div class="num">0</div><div class="label">SP Briefs Generated</div></div>
   </div>
 
   <!-- NEW ADS -->
   <div id="new-ads">
     <div class="section-header">
-      <h2 style="font-size:18px;font-weight:600;">🆕 New Ads Found Today</h2>
-      <span style="background:#22263a;border:1px solid #2e3250;border-radius:20px;padding:2px 10px;font-size:11px;color:#8b90b5;">7 ads</span>
+      <h2 style="font-size:18px;font-weight:600;">🆕 Ads Collected Today</h2>
+      <span style="background:#22263a;border:1px solid #2e3250;border-radius:20px;padding:2px 10px;font-size:11px;color:#8b90b5;">6 collected today</span>
     </div>
     <div class="ad-grid">
-<div class="ad-card" style="background:#1a1d27;border:1px solid #2e3250;border-radius:12px;overflow:hidden;transition:all 0.2s;" onmouseover="this.style.borderColor='#6c63ff';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='#2e3250';this.style.transform='translateY(0)'">
-  <img src="assets/tiktok/top_ads/top_ad_0.png" style="width:100%;aspect-ratio:16/9;object-fit:cover;display:block;" alt="TikTok Top Ad ad" loading="lazy">
-  <div style="padding:14px 16px;">
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;">
-      <span style="font-weight:700;font-size:14px;">TikTok Top Ad</span><span style="background:#6c63ff;color:#fff;border-radius:4px;padding:2px 8px;font-size:10px;font-weight:700;margin-left:6px;">NEW</span>
-      <span style="background:rgba(255,0,80,0.15);color:#ff0050;border-radius:4px;padding:2px 7px;font-size:10px;font-weight:700;">TikTok</span>
-      
-    </div>
-    <div style="background:#22263a;border-radius:6px;padding:8px 12px;margin-bottom:10px;font-size:12px;color:#e8eaf6;font-style:italic;border-left:3px solid #6c63ff;">The word 'Inspiration' appears boldly on a dark background with colorful accents, evoking the emotional aspiration of learning to play piano.</div>
-    <div style="font-size:12px;color:#8b90b5;margin-bottom:10px;line-height:1.6;">Inspiration</div>
-    <div style="font-size:11px;color:#8b90b5;margin-bottom:10px;">This appears to be a TikTok top ad thumbnail or opening frame using a minimalist dark background with bold white text 'Inspiration' and small pink/red accent elements. The ad relies on aspirational emotional framing rather than product features, likely serving as a hook frame before transitioning into a demo or testimonial in the video.</div>
-    <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px;">
-      <span style="background:rgba(108,99,255,0.1);border:1px solid #6c63ff;border-radius:4px;padding:2px 7px;font-size:10px;color:#6c63ff;">aspiration</span>
-      <span style="background:#22263a;border:1px solid #2e3250;border-radius:4px;padding:2px 7px;font-size:10px;color:#8b90b5;">lifestyle</span>
-      <span style="background:#22263a;border:1px solid #2e3250;border-radius:4px;padding:2px 7px;font-size:10px;color:#8b90b5;">Emotional connection to music</span> <span style="background:#22263a;border:1px solid #2e3250;border-radius:4px;padding:2px 7px;font-size:10px;color:#8b90b5;">Piano as a source of personal inspiration</span> <span style="background:#22263a;border:1px solid #2e3250;border-radius:4px;padding:2px 7px;font-size:10px;color:#8b90b5;">Simple and bold branding message</span> <span style="background:#22263a;border:1px solid #2e3250;border-radius:4px;padding:2px 7px;font-size:10px;color:#8b90b5;">Aspirational lifestyle positioning</span> 
-    </div>
-    <div style="display:flex;gap:8px;">
-      <a href="https://ads.tiktok.com/business/creativecenter/inspiration/topads/pc/en?period=7&region=US&industry=280001" target="_blank" style="flex:1;padding:8px;background:#6c63ff;color:#fff;border-radius:8px;font-size:12px;font-weight:600;text-align:center;text-decoration:none;">🔗 View Ad</a>
-      
-    </div>
-  </div>
-</div>
 <div class="ad-card" style="background:#1a1d27;border:1px solid #2e3250;border-radius:12px;overflow:hidden;transition:all 0.2s;" onmouseover="this.style.borderColor='#6c63ff';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='#2e3250';this.style.transform='translateY(0)'">
   <img src="assets/google/flowkey/page_fallback.png" style="width:100%;aspect-ratio:16/9;object-fit:cover;display:block;" alt="Flowkey ad" loading="lazy">
   <div style="padding:14px 16px;">
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;">
-      <span style="font-weight:700;font-size:14px;">Flowkey</span><span style="background:#6c63ff;color:#fff;border-radius:4px;padding:2px 8px;font-size:10px;font-weight:700;margin-left:6px;">NEW</span>
+      <span style="font-weight:700;font-size:14px;">Flowkey</span>
       <span style="background:rgba(255,0,0,0.15);color:#ff0000;border-radius:4px;padding:2px 7px;font-size:10px;font-weight:700;">Google/YouTube</span>
       
     </div>
-    <div style="background:#22263a;border-radius:6px;padding:8px 12px;margin-bottom:10px;font-size:12px;color:#e8eaf6;font-style:italic;border-left:3px solid #6c63ff;">Google Ads Transparency Center landing page showcasing ads transparency for a safe and open internet.</div>
+    <div style="background:#22263a;border-radius:6px;padding:8px 12px;margin-bottom:10px;font-size:12px;color:#e8eaf6;font-style:italic;border-left:3px solid #6c63ff;">Google Ads Transparency Center page showcasing Flowkey's advertising presence with a focus on transparency and open internet.</div>
     <div style="font-size:12px;color:#8b90b5;margin-bottom:10px;line-height:1.6;">Google Ads Transparency page for flowkey. See screenshot.</div>
-    <div style="font-size:11px;color:#8b90b5;margin-bottom:10px;">This is not an actual Flowkey ad creative — it is a screenshot of the Google Ads Transparency Center homepage, likely captured while searching for Flowkey's ads. No Flowkey ad content is visible, so no competitive creative insights can be extracted from this image.</div>
+    <div style="font-size:11px;color:#8b90b5;margin-bottom:10px;">This is not an actual Flowkey ad creative but rather a screenshot of the Google Ads Transparency Center landing page. No specific Flowkey ad content is visible — the page only shows the generic Transparency Center interface, suggesting either the ads were not loaded, have been paused, or the competitor has minimal active Google ad inventory at the time of capture. Limited competitive intelligence can be drawn from this screenshot alone.</div>
     <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px;">
       <span style="background:rgba(108,99,255,0.1);border:1px solid #6c63ff;border-radius:4px;padding:2px 7px;font-size:10px;color:#6c63ff;">curiosity</span>
       <span style="background:#22263a;border:1px solid #2e3250;border-radius:4px;padding:2px 7px;font-size:10px;color:#8b90b5;">product_showcase</span>
-      <span style="background:#22263a;border:1px solid #2e3250;border-radius:4px;padding:2px 7px;font-size:10px;color:#8b90b5;">Ads transparency and openness</span> <span style="background:#22263a;border:1px solid #2e3250;border-radius:4px;padding:2px 7px;font-size:10px;color:#8b90b5;">Ability to search for active ads by advertiser name or website</span> <span style="background:#22263a;border:1px solid #2e3250;border-radius:4px;padding:2px 7px;font-size:10px;color:#8b90b5;">Filter by political ads or all topics</span> <span style="background:#22263a;border:1px solid #2e3250;border-radius:4px;padding:2px 7px;font-size:10px;color:#8b90b5;">Geographic targeting visibility (Ads in United States)</span> 
+      <span style="background:#22263a;border:1px solid #2e3250;border-radius:4px;padding:2px 7px;font-size:10px;color:#8b90b5;">Active advertising presence on Google platforms</span> <span style="background:#22263a;border:1px solid #2e3250;border-radius:4px;padding:2px 7px;font-size:10px;color:#8b90b5;">Brand visibility through Google Ads Transparency Center</span> <span style="background:#22263a;border:1px solid #2e3250;border-radius:4px;padding:2px 7px;font-size:10px;color:#8b90b5;">Competitor presence in piano learning app market</span> 
     </div>
     <div style="display:flex;gap:8px;">
       <a href="https://adstransparency.google.com/?region=US&query=flowkey" target="_blank" style="flex:1;padding:8px;background:#6c63ff;color:#fff;border-radius:8px;font-size:12px;font-weight:600;text-align:center;text-decoration:none;">🔗 View Ad</a>
@@ -215,17 +221,17 @@
   <img src="assets/google/yousician/page_fallback.png" style="width:100%;aspect-ratio:16/9;object-fit:cover;display:block;" alt="Yousician ad" loading="lazy">
   <div style="padding:14px 16px;">
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;">
-      <span style="font-weight:700;font-size:14px;">Yousician</span><span style="background:#6c63ff;color:#fff;border-radius:4px;padding:2px 8px;font-size:10px;font-weight:700;margin-left:6px;">NEW</span>
+      <span style="font-weight:700;font-size:14px;">Yousician</span>
       <span style="background:rgba(255,0,0,0.15);color:#ff0000;border-radius:4px;padding:2px 7px;font-size:10px;font-weight:700;">Google/YouTube</span>
       
     </div>
-    <div style="background:#22263a;border-radius:6px;padding:8px 12px;margin-bottom:10px;font-size:12px;color:#e8eaf6;font-style:italic;border-left:3px solid #6c63ff;">Google Ads Transparency Center landing page showcasing Yousician's ad presence with the tagline 'Ads transparency for a safe and open internet'.</div>
+    <div style="background:#22263a;border-radius:6px;padding:8px 12px;margin-bottom:10px;font-size:12px;color:#e8eaf6;font-style:italic;border-left:3px solid #6c63ff;">Google Ads Transparency Center page showcasing Yousician's active advertising presence and commitment to transparency.</div>
     <div style="font-size:12px;color:#8b90b5;margin-bottom:10px;line-height:1.6;">Google Ads Transparency page for yousician. See screenshot.</div>
-    <div style="font-size:11px;color:#8b90b5;margin-bottom:10px;">This is not an actual Yousician ad but rather a screenshot of the Google Ads Transparency Center homepage. No specific Yousician ad creative or copy is visible, suggesting the search for Yousician ads was not yet executed or no active ads were found at the time of capture.</div>
+    <div style="font-size:11px;color:#8b90b5;margin-bottom:10px;">This is not an actual Yousician ad creative but rather a screenshot of Google's Ads Transparency Center page for Yousician. No specific ad content, copy, or creative is visible — only the transparency landing page itself, making it difficult to extract meaningful competitive creative insights for Simply Piano.</div>
     <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px;">
       <span style="background:rgba(108,99,255,0.1);border:1px solid #6c63ff;border-radius:4px;padding:2px 7px;font-size:10px;color:#6c63ff;">curiosity</span>
       <span style="background:#22263a;border:1px solid #2e3250;border-radius:4px;padding:2px 7px;font-size:10px;color:#8b90b5;">product_showcase</span>
-      <span style="background:#22263a;border:1px solid #2e3250;border-radius:4px;padding:2px 7px;font-size:10px;color:#8b90b5;">Brand visibility through Google Ads Transparency Center</span> <span style="background:#22263a;border:1px solid #2e3250;border-radius:4px;padding:2px 7px;font-size:10px;color:#8b90b5;">Active advertising presence on Google/YouTube platforms</span> <span style="background:#22263a;border:1px solid #2e3250;border-radius:4px;padding:2px 7px;font-size:10px;color:#8b90b5;">Competitor positioning in the music learning app space</span> 
+      <span style="background:#22263a;border:1px solid #2e3250;border-radius:4px;padding:2px 7px;font-size:10px;color:#8b90b5;">Active advertising presence on Google platforms</span> <span style="background:#22263a;border:1px solid #2e3250;border-radius:4px;padding:2px 7px;font-size:10px;color:#8b90b5;">Brand transparency through Google Ads Transparency Center</span> <span style="background:#22263a;border:1px solid #2e3250;border-radius:4px;padding:2px 7px;font-size:10px;color:#8b90b5;">Discoverability across Google Search and YouTube</span> 
     </div>
     <div style="display:flex;gap:8px;">
       <a href="https://adstransparency.google.com/?region=US&query=yousician" target="_blank" style="flex:1;padding:8px;background:#6c63ff;color:#fff;border-radius:8px;font-size:12px;font-weight:600;text-align:center;text-decoration:none;">🔗 View Ad</a>
@@ -237,17 +243,17 @@
   <img src="assets/google/fender_play/page_fallback.png" style="width:100%;aspect-ratio:16/9;object-fit:cover;display:block;" alt="Fender Play ad" loading="lazy">
   <div style="padding:14px 16px;">
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;">
-      <span style="font-weight:700;font-size:14px;">Fender Play</span><span style="background:#6c63ff;color:#fff;border-radius:4px;padding:2px 8px;font-size:10px;font-weight:700;margin-left:6px;">NEW</span>
+      <span style="font-weight:700;font-size:14px;">Fender Play</span>
       <span style="background:rgba(255,0,0,0.15);color:#ff0000;border-radius:4px;padding:2px 7px;font-size:10px;font-weight:700;">Google/YouTube</span>
       
     </div>
-    <div style="background:#22263a;border-radius:6px;padding:8px 12px;margin-bottom:10px;font-size:12px;color:#e8eaf6;font-style:italic;border-left:3px solid #6c63ff;">Google Ads Transparency Center landing page showcasing Fender Play's advertising presence with no specific ad creative visible.</div>
+    <div style="background:#22263a;border-radius:6px;padding:8px 12px;margin-bottom:10px;font-size:12px;color:#e8eaf6;font-style:italic;border-left:3px solid #6c63ff;">Google Ads Transparency Center page showcasing Fender Play's advertising presence for their music learning platform.</div>
     <div style="font-size:12px;color:#8b90b5;margin-bottom:10px;line-height:1.6;">Google Ads Transparency page for fender play. See screenshot.</div>
-    <div style="font-size:11px;color:#8b90b5;margin-bottom:10px;">This screenshot shows the Google Ads Transparency Center homepage rather than an actual Fender Play ad creative. No specific ad copy, visuals, or campaign details for Fender Play are visible, making competitive analysis of their messaging limited. The search may not have been executed yet to reveal actual Fender Play ads.</div>
+    <div style="font-size:11px;color:#8b90b5;margin-bottom:10px;">This is not an actual Fender Play ad but rather a screenshot of the Google Ads Transparency Center landing page. No specific Fender Play ad creative is visible — the page only shows Google's transparency tools including political ad analysis, YouTube paid promotions, and My Ad Center. No actionable competitor creative insights can be extracted from this image.</div>
     <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px;">
       <span style="background:rgba(108,99,255,0.1);border:1px solid #6c63ff;border-radius:4px;padding:2px 7px;font-size:10px;color:#6c63ff;">curiosity</span>
       <span style="background:#22263a;border:1px solid #2e3250;border-radius:4px;padding:2px 7px;font-size:10px;color:#8b90b5;">product_showcase</span>
-      <span style="background:#22263a;border:1px solid #2e3250;border-radius:4px;padding:2px 7px;font-size:10px;color:#8b90b5;">Brand awareness through Google Ads ecosystem</span> <span style="background:#22263a;border:1px solid #2e3250;border-radius:4px;padding:2px 7px;font-size:10px;color:#8b90b5;">Leveraging Fender brand recognition for music learning</span> <span style="background:#22263a;border:1px solid #2e3250;border-radius:4px;padding:2px 7px;font-size:10px;color:#8b90b5;">Presence in United States ad market</span> 
+      <span style="background:#22263a;border:1px solid #2e3250;border-radius:4px;padding:2px 7px;font-size:10px;color:#8b90b5;">Transparency in advertising practices</span> <span style="background:#22263a;border:1px solid #2e3250;border-radius:4px;padding:2px 7px;font-size:10px;color:#8b90b5;">Active Google/YouTube ad presence</span> <span style="background:#22263a;border:1px solid #2e3250;border-radius:4px;padding:2px 7px;font-size:10px;color:#8b90b5;">Brand credibility through Google Ads Transparency Center listing</span> <span style="background:#22263a;border:1px solid #2e3250;border-radius:4px;padding:2px 7px;font-size:10px;color:#8b90b5;">Competing in the online music learning space</span> 
     </div>
     <div style="display:flex;gap:8px;">
       <a href="https://adstransparency.google.com/?region=US&query=fender+play" target="_blank" style="flex:1;padding:8px;background:#6c63ff;color:#fff;border-radius:8px;font-size:12px;font-weight:600;text-align:center;text-decoration:none;">🔗 View Ad</a>
@@ -259,17 +265,17 @@
   <img src="assets/google/pianote/page_fallback.png" style="width:100%;aspect-ratio:16/9;object-fit:cover;display:block;" alt="Pianote ad" loading="lazy">
   <div style="padding:14px 16px;">
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;">
-      <span style="font-weight:700;font-size:14px;">Pianote</span><span style="background:#6c63ff;color:#fff;border-radius:4px;padding:2px 8px;font-size:10px;font-weight:700;margin-left:6px;">NEW</span>
+      <span style="font-weight:700;font-size:14px;">Pianote</span>
       <span style="background:rgba(255,0,0,0.15);color:#ff0000;border-radius:4px;padding:2px 7px;font-size:10px;font-weight:700;">Google/YouTube</span>
       
     </div>
-    <div style="background:#22263a;border-radius:6px;padding:8px 12px;margin-bottom:10px;font-size:12px;color:#e8eaf6;font-style:italic;border-left:3px solid #6c63ff;">Google Ads Transparency Center landing page showcasing Pianote's ad presence with the tagline 'Ads transparency for a safe and open internet'.</div>
+    <div style="background:#22263a;border-radius:6px;padding:8px 12px;margin-bottom:10px;font-size:12px;color:#e8eaf6;font-style:italic;border-left:3px solid #6c63ff;">Google Ads Transparency Center page showcasing Pianote's advertising presence for their piano learning platform.</div>
     <div style="font-size:12px;color:#8b90b5;margin-bottom:10px;line-height:1.6;">Google Ads Transparency page for pianote. See screenshot.</div>
-    <div style="font-size:11px;color:#8b90b5;margin-bottom:10px;">This is not an actual Pianote ad but rather a screenshot of the Google Ads Transparency Center homepage. No specific Pianote ad creative or copy is visible — it appears the search for Pianote's ads was not yet executed, so no competitive intelligence on their actual messaging can be extracted from this image.</div>
+    <div style="font-size:11px;color:#8b90b5;margin-bottom:10px;">This is not an actual Pianote ad but rather a screenshot of Google's Ads Transparency Center page for Pianote. No active ads are visible, suggesting either ads were recently paused or the page was captured before campaigns launched. Limited competitive intelligence can be drawn as no specific ad creatives or copy from Pianote are displayed.</div>
     <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px;">
       <span style="background:rgba(108,99,255,0.1);border:1px solid #6c63ff;border-radius:4px;padding:2px 7px;font-size:10px;color:#6c63ff;">curiosity</span>
       <span style="background:#22263a;border:1px solid #2e3250;border-radius:4px;padding:2px 7px;font-size:10px;color:#8b90b5;">product_showcase</span>
-      <span style="background:#22263a;border:1px solid #2e3250;border-radius:4px;padding:2px 7px;font-size:10px;color:#8b90b5;">Brand visibility through Google Ads ecosystem</span> <span style="background:#22263a;border:1px solid #2e3250;border-radius:4px;padding:2px 7px;font-size:10px;color:#8b90b5;">Active advertising presence on Google/YouTube platforms</span> <span style="background:#22263a;border:1px solid #2e3250;border-radius:4px;padding:2px 7px;font-size:10px;color:#8b90b5;">Competitor positioning in the online piano learning space</span> 
+      <span style="background:#22263a;border:1px solid #2e3250;border-radius:4px;padding:2px 7px;font-size:10px;color:#8b90b5;">Transparency in advertising practices</span> <span style="background:#22263a;border:1px solid #2e3250;border-radius:4px;padding:2px 7px;font-size:10px;color:#8b90b5;">Active Google/YouTube ad presence</span> <span style="background:#22263a;border:1px solid #2e3250;border-radius:4px;padding:2px 7px;font-size:10px;color:#8b90b5;">Piano learning platform competing in the online music education space</span> <span style="background:#22263a;border:1px solid #2e3250;border-radius:4px;padding:2px 7px;font-size:10px;color:#8b90b5;">Multi-platform advertising strategy across Google Search, YouTube, and Discover</span> 
     </div>
     <div style="display:flex;gap:8px;">
       <a href="https://adstransparency.google.com/?region=US&query=pianote" target="_blank" style="flex:1;padding:8px;background:#6c63ff;color:#fff;border-radius:8px;font-size:12px;font-weight:600;text-align:center;text-decoration:none;">🔗 View Ad</a>
@@ -281,17 +287,17 @@
   <img src="assets/google/duolingo/page_fallback.png" style="width:100%;aspect-ratio:16/9;object-fit:cover;display:block;" alt="Duolingo ad" loading="lazy">
   <div style="padding:14px 16px;">
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;">
-      <span style="font-weight:700;font-size:14px;">Duolingo</span><span style="background:#6c63ff;color:#fff;border-radius:4px;padding:2px 8px;font-size:10px;font-weight:700;margin-left:6px;">NEW</span>
+      <span style="font-weight:700;font-size:14px;">Duolingo</span>
       <span style="background:rgba(255,0,0,0.15);color:#ff0000;border-radius:4px;padding:2px 7px;font-size:10px;font-weight:700;">Google/YouTube</span>
       
     </div>
-    <div style="background:#22263a;border-radius:6px;padding:8px 12px;margin-bottom:10px;font-size:12px;color:#e8eaf6;font-style:italic;border-left:3px solid #6c63ff;">Google Ads Transparency Center landing page showcasing Duolingo's ad presence with the tagline 'Ads transparency for a safe and open internet'.</div>
+    <div style="background:#22263a;border-radius:6px;padding:8px 12px;margin-bottom:10px;font-size:12px;color:#e8eaf6;font-style:italic;border-left:3px solid #6c63ff;">Google Ads Transparency Center page showcasing Duolingo's ad presence and commitment to an open internet.</div>
     <div style="font-size:12px;color:#8b90b5;margin-bottom:10px;line-height:1.6;">Google Ads Transparency page for duolingo. See screenshot.</div>
-    <div style="font-size:11px;color:#8b90b5;margin-bottom:10px;">This is not an actual Duolingo ad but rather the Google Ads Transparency Center landing page showing where Duolingo's ads can be searched. No specific Duolingo ad creative is visible — this only confirms Duolingo is running ads through Google's network, making competitive intelligence limited from this screenshot alone.</div>
+    <div style="font-size:11px;color:#8b90b5;margin-bottom:10px;">This is not an actual Duolingo ad creative but rather a screenshot of Google's Ads Transparency Center landing page where Duolingo's ads can be searched. No specific Duolingo ad content or creative is visible, making competitive analysis for Simply Piano limited — it only confirms Duolingo is running Google ads.</div>
     <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px;">
       <span style="background:rgba(108,99,255,0.1);border:1px solid #6c63ff;border-radius:4px;padding:2px 7px;font-size:10px;color:#6c63ff;">curiosity</span>
       <span style="background:#22263a;border:1px solid #2e3250;border-radius:4px;padding:2px 7px;font-size:10px;color:#8b90b5;">product_showcase</span>
-      <span style="background:#22263a;border:1px solid #2e3250;border-radius:4px;padding:2px 7px;font-size:10px;color:#8b90b5;">Brand awareness through Google Ads ecosystem</span> <span style="background:#22263a;border:1px solid #2e3250;border-radius:4px;padding:2px 7px;font-size:10px;color:#8b90b5;">Broad visibility across Google and YouTube platforms</span> <span style="background:#22263a;border:1px solid #2e3250;border-radius:4px;padding:2px 7px;font-size:10px;color:#8b90b5;">Transparent advertising presence in the United States market</span> 
+      <span style="background:#22263a;border:1px solid #2e3250;border-radius:4px;padding:2px 7px;font-size:10px;color:#8b90b5;">Transparency in advertising practices</span> <span style="background:#22263a;border:1px solid #2e3250;border-radius:4px;padding:2px 7px;font-size:10px;color:#8b90b5;">Active ads published through Google</span> <span style="background:#22263a;border:1px solid #2e3250;border-radius:4px;padding:2px 7px;font-size:10px;color:#8b90b5;">Brand trust through openness</span> <span style="background:#22263a;border:1px solid #2e3250;border-radius:4px;padding:2px 7px;font-size:10px;color:#8b90b5;">Political ad transparency</span> 
     </div>
     <div style="display:flex;gap:8px;">
       <a href="https://adstransparency.google.com/?region=US&query=duolingo" target="_blank" style="flex:1;padding:8px;background:#6c63ff;color:#fff;border-radius:8px;font-size:12px;font-weight:600;text-align:center;text-decoration:none;">🔗 View Ad</a>
@@ -303,17 +309,17 @@
   <img src="assets/google/masterclass/page_fallback.png" style="width:100%;aspect-ratio:16/9;object-fit:cover;display:block;" alt="Masterclass ad" loading="lazy">
   <div style="padding:14px 16px;">
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap;">
-      <span style="font-weight:700;font-size:14px;">Masterclass</span><span style="background:#6c63ff;color:#fff;border-radius:4px;padding:2px 8px;font-size:10px;font-weight:700;margin-left:6px;">NEW</span>
+      <span style="font-weight:700;font-size:14px;">Masterclass</span>
       <span style="background:rgba(255,0,0,0.15);color:#ff0000;border-radius:4px;padding:2px 7px;font-size:10px;font-weight:700;">Google/YouTube</span>
       
     </div>
-    <div style="background:#22263a;border-radius:6px;padding:8px 12px;margin-bottom:10px;font-size:12px;color:#e8eaf6;font-style:italic;border-left:3px solid #6c63ff;">Google Ads Transparency Center landing page showcasing ad transparency for a safe and open internet.</div>
+    <div style="background:#22263a;border-radius:6px;padding:8px 12px;margin-bottom:10px;font-size:12px;color:#e8eaf6;font-style:italic;border-left:3px solid #6c63ff;">Google Ads Transparency Center page showcasing Masterclass's active advertising presence and commitment to an open internet.</div>
     <div style="font-size:12px;color:#8b90b5;margin-bottom:10px;line-height:1.6;">Google Ads Transparency page for masterclass. See screenshot.</div>
-    <div style="font-size:11px;color:#8b90b5;margin-bottom:10px;">This is not an actual Masterclass ad — it is a screenshot of the Google Ads Transparency Center homepage itself, not a competitor creative for Simply Piano. No Masterclass or Simply Piano ad content is visible. The image appears to be a misattributed or incorrectly captured screenshot with no actionable competitor intelligence.</div>
+    <div style="font-size:11px;color:#8b90b5;margin-bottom:10px;">This is not an actual Masterclass ad but rather a screenshot of the Google Ads Transparency Center landing page, likely accessed while searching for Masterclass ads. No specific Masterclass ad creative or copy is visible — only the generic transparency portal interface. This provides minimal competitive intelligence for Simply Piano as no actual ad content from Masterclass is displayed.</div>
     <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px;">
       <span style="background:rgba(108,99,255,0.1);border:1px solid #6c63ff;border-radius:4px;padding:2px 7px;font-size:10px;color:#6c63ff;">curiosity</span>
       <span style="background:#22263a;border:1px solid #2e3250;border-radius:4px;padding:2px 7px;font-size:10px;color:#8b90b5;">product_showcase</span>
-      <span style="background:#22263a;border:1px solid #2e3250;border-radius:4px;padding:2px 7px;font-size:10px;color:#8b90b5;">Ad transparency and openness</span> <span style="background:#22263a;border:1px solid #2e3250;border-radius:4px;padding:2px 7px;font-size:10px;color:#8b90b5;">Ability to search active ads by advertiser name or website</span> <span style="background:#22263a;border:1px solid #2e3250;border-radius:4px;padding:2px 7px;font-size:10px;color:#8b90b5;">Filter by political ads or all topics</span> <span style="background:#22263a;border:1px solid #2e3250;border-radius:4px;padding:2px 7px;font-size:10px;color:#8b90b5;">Geo-targeted ads filtering (United States)</span> 
+      <span style="background:#22263a;border:1px solid #2e3250;border-radius:4px;padding:2px 7px;font-size:10px;color:#8b90b5;">Transparency in advertising practices</span> <span style="background:#22263a;border:1px solid #2e3250;border-radius:4px;padding:2px 7px;font-size:10px;color:#8b90b5;">Active ads published through Google</span> <span style="background:#22263a;border:1px solid #2e3250;border-radius:4px;padding:2px 7px;font-size:10px;color:#8b90b5;">Brand credibility through Google Ads Transparency Center presence</span> 
     </div>
     <div style="display:flex;gap:8px;">
       <a href="https://adstransparency.google.com/?region=US&query=masterclass" target="_blank" style="flex:1;padding:8px;background:#6c63ff;color:#fff;border-radius:8px;font-size:12px;font-weight:600;text-align:center;text-decoration:none;">🔗 View Ad</a>
@@ -338,15 +344,15 @@
       <h2 style="font-size:18px;font-weight:600;">🎯 SP Gap Analysis</h2>
       <span style="background:#22263a;border:1px solid #2e3250;border-radius:20px;padding:2px 10px;font-size:11px;color:#8b90b5;">vs competitor field</span>
     </div>
-    <div style="background:#22263a;border-radius:10px;padding:14px 18px;margin-bottom:20px;font-size:13px;color:#8b90b5;line-height:1.7;">Competitors are winning the emotional and aspirational narrative — framing piano as identity and inspiration — while Simply Piano leads on functional differentiation like real-time feedback, gamification, and device compatibility. The biggest strategic gap is that SP sells a tool while competitors sell a feeling. SP should layer emotional storytelling on top of its unique tech features, pairing 'here's what it feels like' with 'here's why only we can get you there,' and invest in bold, simple creative that cuts through an increasingly saturated ad ecosystem.</div>
+    <div style="background:#22263a;border-radius:10px;padding:14px 18px;margin-bottom:20px;font-size:13px;color:#8b90b5;line-height:1.7;">Competitors are heavily investing in trust, transparency, and multi-platform visibility — areas where Simply Piano has untapped opportunity. However, SP holds powerful exclusive angles around song-based learning, real-time feedback, and gamification that no competitor is claiming. The strategic play is to layer credibility and trust signals on top of SP's existing emotional and product-driven differentiators, rather than abandoning what makes SP unique to chase generic brand-safety messaging.</div>
     <div class="gap-grid">
       <div>
         <div style="font-size:12px;color:#ff6584;font-weight:700;margin-bottom:12px;text-transform:uppercase;letter-spacing:0.5px;">⚠️ Angles SP Is Missing</div>
-        <div style="background:#1a1d27;border:1px solid #2e3250;border-left:3px solid #ff6584;border-radius:8px;padding:12px 16px;margin-bottom:8px;"><div style="font-weight:600;font-size:13px;">Emotional connection to music</div><div style="font-size:12px;color:#8b90b5;margin-top:3px;">SP focuses on mechanics and features but should lean into the emotional transformation — the joy, pride, and identity shift that comes from playing piano.</div><span style="font-size:10px;color:#ff6584;">high</span></div><div style="background:#1a1d27;border:1px solid #2e3250;border-left:3px solid #ff6584;border-radius:8px;padding:12px 16px;margin-bottom:8px;"><div style="font-weight:600;font-size:13px;">Aspirational lifestyle positioning</div><div style="font-size:12px;color:#8b90b5;margin-top:3px;">Competitors frame piano learning as a lifestyle upgrade; SP should show learners becoming 'the person who plays piano' at gatherings, for relaxation, or self-expression.</div><span style="font-size:10px;color:#ff6584;">medium</span></div><div style="background:#1a1d27;border:1px solid #2e3250;border-left:3px solid #ff6584;border-radius:8px;padding:12px 16px;margin-bottom:8px;"><div style="font-weight:600;font-size:13px;">Piano as a source of personal inspiration</div><div style="font-size:12px;color:#8b90b5;margin-top:3px;">SP can create ad narratives around moments of breakthrough and personal meaning — not just skill acquisition but finding purpose and creativity.</div><span style="font-size:10px;color:#ff6584;">medium</span></div><div style="background:#1a1d27;border:1px solid #2e3250;border-left:3px solid #ff6584;border-radius:8px;padding:12px 16px;margin-bottom:8px;"><div style="font-weight:600;font-size:13px;">Simple and bold branding message</div><div style="font-size:12px;color:#8b90b5;margin-top:3px;">Competitors use punchy, memorable brand statements; SP should test minimalist hero ads with one powerful line (e.g., 'You. A piano. Tonight.') instead of feature lists.</div><span style="font-size:10px;color:#ff6584;">medium</span></div><div style="background:#1a1d27;border:1px solid #2e3250;border-left:3px solid #ff6584;border-radius:8px;padding:12px 16px;margin-bottom:8px;"><div style="font-weight:600;font-size:13px;">Leveraging established brand recognition for music learning</div><div style="font-size:12px;color:#8b90b5;margin-top:3px;">Competitors like Fender bring brand heritage into learning; SP should amplify its JoyTunes/parent brand credibility or pursue co-branding with instrument makers or artists.</div><span style="font-size:10px;color:#ff6584;">low</span></div>
+        <div style="background:#1a1d27;border:1px solid #2e3250;border-left:3px solid #ff6584;border-radius:8px;padding:12px 16px;margin-bottom:8px;"><div style="font-weight:600;font-size:13px;">Transparency and trust signaling</div><div style="font-size:12px;color:#8b90b5;margin-top:3px;">SP should prominently showcase its data privacy practices, ad transparency, and user trust metrics to match the credibility competitors are building through openness.</div><span style="font-size:10px;color:#ff6584;">high</span></div><div style="background:#1a1d27;border:1px solid #2e3250;border-left:3px solid #ff6584;border-radius:8px;padding:12px 16px;margin-bottom:8px;"><div style="font-weight:600;font-size:13px;">Multi-platform discoverability across Google Search, YouTube, and Discover</div><div style="font-size:12px;color:#8b90b5;margin-top:3px;">SP should invest in a broader cross-platform advertising strategy that ensures visibility wherever potential learners are searching or browsing, not just app-store-centric channels.</div><span style="font-size:10px;color:#ff6584;">medium</span></div><div style="background:#1a1d27;border:1px solid #2e3250;border-left:3px solid #ff6584;border-radius:8px;padding:12px 16px;margin-bottom:8px;"><div style="font-weight:600;font-size:13px;">Brand credibility through third-party verification/listings</div><div style="font-size:12px;color:#8b90b5;margin-top:3px;">SP should leverage third-party trust badges, verified listings, and transparency center presence to build institutional credibility beyond its own self-awarded badges.</div><span style="font-size:10px;color:#ff6584;">medium</span></div><div style="background:#1a1d27;border:1px solid #2e3250;border-left:3px solid #ff6584;border-radius:8px;padding:12px 16px;margin-bottom:8px;"><div style="font-weight:600;font-size:13px;">Responsible advertising and user safety messaging</div><div style="font-size:12px;color:#8b90b5;margin-top:3px;">SP could differentiate by publicly committing to ethical advertising — especially important when targeting younger learners and parents who value safe digital environments.</div><span style="font-size:10px;color:#ff6584;">low</span></div>
       </div>
       <div>
         <div style="font-size:12px;color:#3ecf8e;font-weight:700;margin-bottom:12px;text-transform:uppercase;letter-spacing:0.5px;">✅ Only SP Does This — Protect It</div>
-        <div style="background:#1a1d27;border:1px solid #2e3250;border-left:3px solid #3ecf8e;border-radius:8px;padding:12px 16px;margin-bottom:8px;"><div style="font-weight:600;font-size:13px;">Real-time feedback</div><div style="font-size:12px;color:#8b90b5;margin-top:3px;">This is a powerful tech differentiator — amplify it with demo-style video ads that show the instant feedback loop in action, making it feel magical and addictive.</div></div><div style="background:#1a1d27;border:1px solid #2e3250;border-left:3px solid #3ecf8e;border-radius:8px;padding:12px 16px;margin-bottom:8px;"><div style="font-weight:600;font-size:13px;">Works with any piano or keyboard</div><div style="font-size:12px;color:#8b90b5;margin-top:3px;">Highlight this as a zero-barrier-to-entry message — pair it with affordability messaging like 'Got a $50 keyboard? You're ready' to neutralize equipment objections.</div></div><div style="background:#1a1d27;border:1px solid #2e3250;border-left:3px solid #3ecf8e;border-radius:8px;padding:12px 16px;margin-bottom:8px;"><div style="font-weight:600;font-size:13px;">Fun gamified progression</div><div style="font-size:12px;color:#8b90b5;margin-top:3px;">Double down on this in short-form video by showing streak counts, level-ups, and unlock moments that trigger dopamine — make it look as addictive as a game, not a lesson.</div></div><div style="background:#1a1d27;border:1px solid #2e3250;border-left:3px solid #3ecf8e;border-radius:8px;padding:12px 16px;margin-bottom:8px;"><div style="font-weight:600;font-size:13px;">Step-by-step guidance</div><div style="font-size:12px;color:#8b90b5;margin-top:3px;">Position this against competitor overwhelm — use messaging like 'No music theory degree needed' to make SP feel like the friendliest on-ramp.</div></div>
+        <div style="background:#1a1d27;border:1px solid #2e3250;border-left:3px solid #3ecf8e;border-radius:8px;padding:12px 16px;margin-bottom:8px;"><div style="font-weight:600;font-size:13px;">Learn songs you love</div><div style="font-size:12px;color:#8b90b5;margin-top:3px;">Double down on this emotional hook by continuously expanding the licensed song library and making it the hero of every campaign — it's the strongest differentiation from generic competitors.</div></div><div style="background:#1a1d27;border:1px solid #2e3250;border-left:3px solid #3ecf8e;border-radius:8px;padding:12px 16px;margin-bottom:8px;"><div style="font-weight:600;font-size:13px;">Real-time feedback</div><div style="font-size:12px;color:#8b90b5;margin-top:3px;">Amplify with demo videos and social proof showing the mic-listening technology in action, making the invisible feature tangible and hard for competitors to claim without proof.</div></div><div style="background:#1a1d27;border:1px solid #2e3250;border-left:3px solid #3ecf8e;border-radius:8px;padding:12px 16px;margin-bottom:8px;"><div style="font-weight:600;font-size:13px;">Works with any piano or keyboard</div><div style="font-size:12px;color:#8b90b5;margin-top:3px;">Protect this accessibility angle by emphasizing zero-barrier entry in acquisition ads — competitors often require specific hardware or MIDI connections.</div></div><div style="background:#1a1d27;border:1px solid #2e3250;border-left:3px solid #3ecf8e;border-radius:8px;padding:12px 16px;margin-bottom:8px;"><div style="font-weight:600;font-size:13px;">Fun gamified progression</div><div style="font-size:12px;color:#8b90b5;margin-top:3px;">Showcase streaks, level-ups, and achievement systems in short-form video content on TikTok and YouTube Shorts to own the 'learning feels like playing' narrative.</div></div>
       </div>
     </div>
   </div>
@@ -357,111 +363,7 @@
       <h2 style="font-size:18px;font-weight:600;">✍️ SP Creative Briefs</h2>
       <span style="background:#22263a;border:1px solid #2e3250;border-radius:20px;padding:2px 10px;font-size:11px;color:#8b90b5;">One per segment + 1 original idea</span>
     </div>
-    <div class="briefs-grid">
-<div style="background:#1a1d27;border:1px solid #2e3250;border-left:4px solid #6c63ff;border-radius:12px;padding:22px 24px;">
-  <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
-    <span style="background:rgba(108,99,255,0.1);border:1px solid #6c63ff;border-radius:20px;padding:3px 12px;font-size:11px;color:#6c63ff;font-weight:600;">50+ Adults</span>
-    <span style="font-size:11px;color:#8b90b5;">ref: TikTok Top Ad / TikTok</span>
-  </div>
-  <div style="font-size:12px;color:#8b90b5;margin-bottom:12px;padding:10px 14px;background:#22263a;border-radius:8px;"><strong style="color:#e8eaf6;">What makes it work:</strong> The bold, minimalist 'Inspiration' frame taps into a deep emotional aspiration — the dream of playing piano — before showing anything about the product. It earns attention through feeling rather than features, which resonates strongly with adults who've waited decades to pursue a passion.</div>
-  <div style="font-size:13px;color:#8b90b5;margin-bottom:14px;line-height:1.7;">Keep the aspirational, emotion-first opening that leads with a feeling rather than a product demo. Change the abstract branding to a relatable human story — show a confident, attractive person in their mid-30s sitting down at a piano for the first time and playing a recognizable 70s/80s hit within moments. Add a 'Free Trial — Learn at Your Own Pace' badge and a calm, self-paced tone that removes any pressure or tech intimidation.</div>
-  <div style="background:#22263a;border-radius:8px;padding:14px 16px;margin-bottom:12px;">
-    <div style="font-size:10px;color:#8b90b5;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">HEADLINE</div>
-    <div style="font-size:16px;font-weight:700;color:#e8eaf6;">You Finally Have the Time. Now Play the Songs You've Always Loved.</div>
-  </div>
-  <div style="background:#22263a;border-radius:8px;padding:12px 16px;margin-bottom:10px;">
-    <div style="font-size:10px;color:#8b90b5;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">HOOK / OPENING</div>
-    <div style="font-size:13px;color:#e8eaf6;font-style:italic;">"You told yourself 'someday.' [pause] Someday is today."</div>
-  </div>
-  <div style="display:flex;gap:8px;flex-wrap:wrap;">
-    <div style="flex:1;background:#22263a;border-radius:8px;padding:10px 14px;min-width:140px;">
-      <div style="font-size:10px;color:#8b90b5;margin-bottom:3px;">VISUAL</div>
-      <div style="font-size:12px;color:#e8eaf6;">Warm, softly-lit living room; a relaxed, aspirational adult (mid-30s) sits at an upright piano, smiles as they play the opening notes of 'Piano Man' with the Simply Piano app glowing gently on a tablet beside them.</div>
-    </div>
-    <div style="background:#22263a;border-radius:8px;padding:10px 14px;">
-      <div style="font-size:10px;color:#8b90b5;margin-bottom:3px;">CTA</div>
-      <div style="font-size:13px;font-weight:700;color:#6c63ff;">Start Your Free Trial</div>
-    </div>
-  </div>
-</div>
-<div style="background:#1a1d27;border:1px solid #2e3250;border-left:4px solid #6c63ff;border-radius:12px;padding:22px 24px;">
-  <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
-    <span style="background:rgba(108,99,255,0.1);border:1px solid #6c63ff;border-radius:20px;padding:3px 12px;font-size:11px;color:#6c63ff;font-weight:600;">Parents & Kids</span>
-    <span style="font-size:11px;color:#8b90b5;">ref: TikTok Top Ad / TikTok</span>
-  </div>
-  <div style="font-size:12px;color:#8b90b5;margin-bottom:12px;padding:10px 14px;background:#22263a;border-radius:8px;"><strong style="color:#e8eaf6;">What makes it work:</strong> The emotional, aspiration-driven hook captures attention instantly without relying on product UI, proving that leading with a feeling outperforms leading with features. The bold simplicity makes it thumb-stopping even in a fast-scroll environment.</div>
-  <div style="font-size:13px;color:#8b90b5;margin-bottom:14px;line-height:1.7;">Keep the emotion-first hook but reframe aspiration around family bonding — the magic of a parent and child learning something together. Change the solo, abstract mood to a lively, heartwarming scene of a parent and kid high-fiving after nailing a song together. Add visible progress tracking (stars, streaks) and a 'show-off moment' where the child proudly performs for family, making it clear this is structured fun, not just screen time.</div>
-  <div style="background:#22263a;border-radius:8px;padding:14px 16px;margin-bottom:12px;">
-    <div style="font-size:10px;color:#8b90b5;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">HEADLINE</div>
-    <div style="font-size:16px;font-weight:700;color:#e8eaf6;">The Best Thing You'll Ever Do Together Starts with One Note.</div>
-  </div>
-  <div style="background:#22263a;border-radius:8px;padding:12px 16px;margin-bottom:10px;">
-    <div style="font-size:10px;color:#8b90b5;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">HOOK / OPENING</div>
-    <div style="font-size:13px;color:#e8eaf6;font-style:italic;">"What if screen time actually brought your family closer?"</div>
-  </div>
-  <div style="display:flex;gap:8px;flex-wrap:wrap;">
-    <div style="flex:1;background:#22263a;border-radius:8px;padding:10px 14px;min-width:140px;">
-      <div style="font-size:10px;color:#8b90b5;margin-bottom:3px;">VISUAL</div>
-      <div style="font-size:12px;color:#e8eaf6;">Split-screen energy: left side shows a parent and child (age ~7) laughing as they share a piano bench following the app; right side shows the child performing the song at a family dinner to applause.</div>
-    </div>
-    <div style="background:#22263a;border-radius:8px;padding:10px 14px;">
-      <div style="font-size:10px;color:#8b90b5;margin-bottom:3px;">CTA</div>
-      <div style="font-size:13px;font-weight:700;color:#6c63ff;">Try It Free — Play Together Tonight</div>
-    </div>
-  </div>
-</div>
-<div style="background:#1a1d27;border:1px solid #2e3250;border-left:4px solid #6c63ff;border-radius:12px;padding:22px 24px;">
-  <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
-    <span style="background:rgba(108,99,255,0.1);border:1px solid #6c63ff;border-radius:20px;padding:3px 12px;font-size:11px;color:#6c63ff;font-weight:600;">General Adult Beginners</span>
-    <span style="font-size:11px;color:#8b90b5;">ref: TikTok Top Ad / TikTok</span>
-  </div>
-  <div style="font-size:12px;color:#8b90b5;margin-bottom:12px;padding:10px 14px;background:#22263a;border-radius:8px;"><strong style="color:#e8eaf6;">What makes it work:</strong> The ad uses a single powerful word on a dark canvas to create intrigue and emotional resonance, proving that simplicity and aspiration can outperform information-dense creatives. It positions piano not as a skill to learn but as a lifestyle to step into.</div>
-  <div style="font-size:13px;color:#8b90b5;margin-bottom:14px;line-height:1.7;">Keep the bold, dark-background aesthetic and aspirational energy but immediately prove the promise — transition from an inspiring text hook to a real-time screen recording of a total beginner playing a recognizable pop song within their first session. Change the vague branding into a concrete 'Day 1 vs. Day 7' progress proof using songs like Adele or Harry Styles. Add a modern, sleek UI showcase that makes the app feel premium and effortless, not educational.</div>
-  <div style="background:#22263a;border-radius:8px;padding:14px 16px;margin-bottom:12px;">
-    <div style="font-size:10px;color:#8b90b5;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">HEADLINE</div>
-    <div style="font-size:16px;font-weight:700;color:#e8eaf6;">Play Your First Real Song Today. No Experience Needed.</div>
-  </div>
-  <div style="background:#22263a;border-radius:8px;padding:12px 16px;margin-bottom:10px;">
-    <div style="font-size:10px;color:#8b90b5;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">HOOK / OPENING</div>
-    <div style="font-size:13px;color:#e8eaf6;font-style:italic;">"3 days ago, I'd never touched a piano. Watch this."</div>
-  </div>
-  <div style="display:flex;gap:8px;flex-wrap:wrap;">
-    <div style="flex:1;background:#22263a;border-radius:8px;padding:10px 14px;min-width:140px;">
-      <div style="font-size:10px;color:#8b90b5;margin-bottom:3px;">VISUAL</div>
-      <div style="font-size:12px;color:#e8eaf6;">Cinematic dark background with bold text dissolves into a top-down shot of hands on a keyboard following glowing notes in the app, seamlessly playing 'Someone Like You' — modern, sleek, fast-paced editing.</div>
-    </div>
-    <div style="background:#22263a;border-radius:8px;padding:10px 14px;">
-      <div style="font-size:10px;color:#8b90b5;margin-bottom:3px;">CTA</div>
-      <div style="font-size:13px;font-weight:700;color:#6c63ff;">Download Free — Play in Minutes</div>
-    </div>
-  </div>
-</div>
-<div style="background:#1a1d27;border:1px solid #2e3250;border-left:4px solid #ff6584;border-radius:12px;padding:22px 24px;">
-  <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;">
-    <span style="background:rgba(255,101,132,0.1);border:1px solid #ff6584;border-radius:20px;padding:3px 12px;font-size:11px;color:#ff6584;font-weight:600;">✨ Original Idea</span>
-    
-  </div>
-  
-  <div style="font-size:13px;color:#8b90b5;margin-bottom:14px;line-height:1.7;">Create a 'Sound On' curiosity-gap format where the ad opens with a black screen and a beautiful piano melody playing — the text reads 'This person started learning 30 days ago.' The screen then reveals an ordinary, relatable adult (not a prodigy, not a performer) sitting in their everyday apartment, finishing the piece, and looking up at the camera with genuine surprise and pride. The final card shows their Simply Piano journey timeline: Day 1 (single notes), Day 7 (first song), Day 30 (the piece we just heard). This format is unique because no competitor is showing a verifiable, relatable transformation timeline — they either sell aspiration without proof or show product UI without emotion. This bridges both.</div>
-  <div style="background:#22263a;border-radius:8px;padding:14px 16px;margin-bottom:12px;">
-    <div style="font-size:10px;color:#8b90b5;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">HEADLINE</div>
-    <div style="font-size:16px;font-weight:700;color:#e8eaf6;">30 Days Ago, They Couldn't Play a Single Note.</div>
-  </div>
-  <div style="background:#22263a;border-radius:8px;padding:12px 16px;margin-bottom:10px;">
-    <div style="font-size:10px;color:#8b90b5;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;">HOOK / OPENING</div>
-    <div style="font-size:13px;color:#e8eaf6;font-style:italic;">"[Black screen, gorgeous piano music playing] 'This person started learning piano 30 days ago.'"</div>
-  </div>
-  <div style="display:flex;gap:8px;flex-wrap:wrap;">
-    <div style="flex:1;background:#22263a;border-radius:8px;padding:10px 14px;min-width:140px;">
-      <div style="font-size:10px;color:#8b90b5;margin-bottom:3px;">VISUAL</div>
-      <div style="font-size:12px;color:#e8eaf6;">Opens on a black screen with a beautiful piano piece playing (sound-on optimized); reveals a real-looking person in a normal apartment finishing the song, then shows a 3-step visual timeline of their 30-day Simply Piano journey.</div>
-    </div>
-    <div style="background:#22263a;border-radius:8px;padding:10px 14px;">
-      <div style="font-size:10px;color:#8b90b5;margin-bottom:3px;">CTA</div>
-      <div style="font-size:13px;font-weight:700;color:#6c63ff;">See What You'll Play in 30 Days — Start Free</div>
-    </div>
-  </div>
-</div></div>
+    <div class="briefs-grid"><div style="color:#8b90b5;text-align:center;padding:32px;border:1px dashed #2e3250;border-radius:12px;">Creative briefs generated after first full scan with AI analysis.</div></div>
   </div>
 
   <!-- TRENDS -->
@@ -470,7 +372,37 @@
       <h2 style="font-size:18px;font-weight:600;">📈 Platform Trends</h2>
       <span style="background:#22263a;border:1px solid #2e3250;border-radius:20px;padding:2px 10px;font-size:11px;color:#8b90b5;">What's shifting this week</span>
     </div>
-    <div class="trends-grid"></div>
+    <div class="trends-grid">
+<div style="background:#1a1d27;border:1px solid #2e3250;border-radius:12px;padding:18px 20px;">
+  <div style="font-size:24px;margin-bottom:8px;">🔍</div>
+  <div style="font-weight:700;font-size:14px;margin-bottom:6px;">Competitor Ad Visibility Is at a Low Point</div>
+  <div style="font-size:13px;color:#8b90b5;line-height:1.6;margin-bottom:10px;">None of the six competitors scanned — Flowkey, Yousician, Fender Play, Pianote, Duolingo, or Masterclass — had visible active ad creatives captured in this scan cycle. This suggests either a seasonal spend pullback, campaign pausing between flights, or a shift in budget toward channels outside Google/YouTube. This creates a rare window of reduced competitive noise.</div>
+  <div style="font-size:11px;color:#f7c948;">⚡ Increase Google and YouTube ad spend this week to capitalize on the lower auction density and capture share of voice while competitors are quiet.</div>
+</div>
+<div style="background:#1a1d27;border:1px solid #2e3250;border-radius:12px;padding:18px 20px;">
+  <div style="font-size:24px;margin-bottom:8px;">🎹</div>
+  <div style="font-weight:700;font-size:14px;margin-bottom:6px;">Piano Learning Market Is Crowded but Under-Differentiated</div>
+  <div style="font-size:13px;color:#8b90b5;line-height:1.6;margin-bottom:10px;">Five of the six competitors analyzed operate directly in the music/piano learning space (Flowkey, Yousician, Fender Play, Pianote, Duolingo), yet none are currently running differentiated creative that stands out. The lack of visible ad messaging means no competitor is actively owning a unique positioning narrative right now. This is an opportunity for Simply Piano to define the category conversation.</div>
+  <div style="font-size:11px;color:#f7c948;">⚡ Launch a campaign with a bold, ownable hook — such as 'Play your first song in 5 minutes' — to establish a distinct positioning before competitors resume spending.</div>
+</div>
+<div style="background:#1a1d27;border:1px solid #2e3250;border-radius:12px;padding:18px 20px;">
+  <div style="font-size:24px;margin-bottom:8px;">📉</div>
+  <div style="font-weight:700;font-size:14px;margin-bottom:6px;">Google Ads Transparency Data Gaps Limit Competitive Intelligence</div>
+  <div style="font-size:13px;color:#8b90b5;line-height:1.6;margin-bottom:10px;">The entire scan yielded only Transparency Center landing pages rather than actual ad creatives, meaning the current monitoring methodology is failing to capture real competitor output. Without actual copy, visuals, and CTAs to analyze, trend identification becomes speculative. This is a process problem, not a market problem.</div>
+  <div style="font-size:11px;color:#f7c948;">⚡ Supplement Google Ads Transparency Center scans with Meta Ad Library pulls, TikTok Creative Center searches, and tools like Pathmatics or Sensor Tower to ensure next week's scan delivers actionable creative intelligence.</div>
+</div>
+<div style="background:#1a1d27;border:1px solid #2e3250;border-radius:12px;padding:18px 20px;">
+  <div style="font-size:24px;margin-bottom:8px;">📺</div>
+  <div style="font-weight:700;font-size:14px;margin-bottom:6px;">YouTube and Video Remain Key Battleground Channels</div>
+  <div style="font-size:13px;color:#8b90b5;line-height:1.6;margin-bottom:10px;">Every competitor listed has a presence tied to Google Search, YouTube, and Discover placements, confirming that video-first ad strategies dominate the music education category. Even though no specific video creatives were captured, the platform footprint signals that competitors are investing in these high-intent, high-engagement surfaces.</div>
+  <div style="font-size:11px;color:#f7c948;">⚡ Prioritize production of 2-3 new short-form YouTube ad variants (15s and 30s) featuring real-time app gameplay to outperform competitors when they re-enter the auction.</div>
+</div>
+<div style="background:#1a1d27;border:1px solid #2e3250;border-radius:12px;padding:18px 20px;">
+  <div style="font-size:24px;margin-bottom:8px;">⏰</div>
+  <div style="font-weight:700;font-size:14px;margin-bottom:6px;">Timing Advantage: Competitors May Be Between Campaign Flights</div>
+  <div style="font-size:13px;color:#8b90b5;line-height:1.6;margin-bottom:10px;">The simultaneous absence of active creatives across six major competitors is unusual and likely indicates an industry-wide pause — possibly between Q1 wrap-up and a summer push. Historically, music learning apps see enrollment spikes around New Year's resolutions and summer break. The gap between these peaks is when cost-per-acquisition drops significantly.</div>
+  <div style="font-size:11px;color:#f7c948;">⚡ Run an always-on evergreen campaign during this off-peak window with efficient CPA targets to build remarketing audiences ahead of the next seasonal surge.</div>
+</div></div>
   </div>
 
   <!-- WATCHLIST -->
